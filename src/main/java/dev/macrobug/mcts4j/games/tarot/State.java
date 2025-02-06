@@ -6,7 +6,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class State implements MctsDomainState<String, Player> {
+public class State implements MctsDomainState<Card, Player> {
+    public enum Suit{
+        SPADE,
+        COPPE,
+        DENARI,
+        BASTONI,
+        TRIONFI
+    }
+    public record Card(int value,Suit suit){}
+    private ArrayList<Card> preseNS= new ArrayList<>();
+    private ArrayList<Card> preseEW= new ArrayList<>();
+
+    private Suit semeDiMano;
 
     private static final int BOARD_SIZE = 3;
     private static final char EMPTY_BOARD_POSITION = '-';
@@ -157,6 +169,11 @@ public class State implements MctsDomainState<String, Player> {
             availableActions.addAll(availableActionsInRow);
         }
         return availableActions;
+    }
+
+    @Override
+    public MctsDomainState performActionForCurrentAgent(Card card) {
+        return null;
     }
 
     private List<String> getAvailableActionsInBoardRow(char[] row, int rowIndex) {

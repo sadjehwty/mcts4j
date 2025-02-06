@@ -7,8 +7,8 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        TicTacToeState state = TicTacToeState.initialize(TicTacToePlayer.Type.NOUGHT);
-        Mcts<TicTacToeState, String, TicTacToePlayer> mcts = Mcts.initializeIterations(15000);
+        State state = State.initialize(Player.Type.NOUGHT);
+        Mcts<State, String, Player> mcts = Mcts.initializeIterations(15000);
         for(int turn=0;!state.isTerminal();turn++) {
             String action;
             if(turn%2==1) action = sc.nextLine();

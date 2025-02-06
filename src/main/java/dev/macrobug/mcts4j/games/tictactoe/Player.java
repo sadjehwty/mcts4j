@@ -5,25 +5,25 @@ import io.github.nejc92.mcts.MctsDomainAgent;
 import java.util.Collections;
 import java.util.List;
 
-public class TicTacToePlayer  implements MctsDomainAgent<TicTacToeState> {
+public class Player implements MctsDomainAgent<State> {
     private final char boardPositionMarker;
 
     public enum Type {
         NOUGHT, CROSS
     }
 
-    public static TicTacToePlayer create(Type type) {
+    public static Player create(Type type) {
         switch (type) {
             case NOUGHT:
-                return new TicTacToePlayer('O');
+                return new Player('O');
             case CROSS:
-                return new TicTacToePlayer('X');
+                return new Player('X');
             default:
                 throw new IllegalArgumentException("Error: invalid player type passed as function parameter");
         }
     }
 
-    private TicTacToePlayer(char boardPositionMarker) {
+    private Player(char boardPositionMarker) {
         this.boardPositionMarker = boardPositionMarker;
     }
 
@@ -32,7 +32,7 @@ public class TicTacToePlayer  implements MctsDomainAgent<TicTacToeState> {
     }
 
     @Override
-    public TicTacToeState getTerminalStateByPerformingSimulationFromState(TicTacToeState state) {
+    public State getTerminalStateByPerformingSimulationFromState(State state) {
         while (!state.isTerminal()) {
             String action = getBiasedOrRandomActionFromStatesAvailableActions(state);
             state.performActionForCurrentAgent(action);
@@ -40,7 +40,7 @@ public class TicTacToePlayer  implements MctsDomainAgent<TicTacToeState> {
         return state;
     }
 
-    private String getBiasedOrRandomActionFromStatesAvailableActions(TicTacToeState state) {
+    private String getBiasedOrRandomActionFromStatesAvailableActions(State state) {
         List<String> availableActions = state.getAvailableActionsForCurrentAgent();
         for (String action : availableActions) {
             if (actionWinsGame(state, action))
@@ -49,7 +49,7 @@ public class TicTacToePlayer  implements MctsDomainAgent<TicTacToeState> {
         return getRandomActionFromActions(availableActions);
     }
 
-    private boolean actionWinsGame(TicTacToeState state, String action) {
+    private boolean actionWinsGame(State state, String action) {
         state.performActionForCurrentAgent(action);
         boolean actionEndsGame = state.isTerminal();
         state.undoAction(action);
@@ -62,7 +62,7 @@ public class TicTacToePlayer  implements MctsDomainAgent<TicTacToeState> {
     }
 
     @Override
-    public double getRewardFromTerminalState(TicTacToeState terminalState) {
+    public double getRewardFromTerminalState(State terminalState) {
         if (terminalState.specificPlayerWon(this))
             return 1;
         else if (terminalState.isDraw())

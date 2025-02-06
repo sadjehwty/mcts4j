@@ -1,33 +1,19 @@
 package dev.macrobug.mcts4j.games.tarot;
 import io.github.nejc92.mcts.MctsDomainAgent;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class Player implements MctsDomainAgent<State> {
-    private final char boardPositionMarker;
+    private ArrayList<State.Card> deck;
+    private final ArrayList<State.Card> gone=new ArrayList<>();
 
-    public enum Type {
-        NOUGHT, CROSS
+    public Player(ArrayList<State.Card> deck) {
+        this.deck=deck;
     }
-
-    public static Player create(Type type) {
-        switch (type) {
-            case NOUGHT:
-                return new Player('O');
-            case CROSS:
-                return new Player('X');
-            default:
-                throw new IllegalArgumentException("Error: invalid player type passed as function parameter");
-        }
-    }
-
-    private Player(char boardPositionMarker) {
-        this.boardPositionMarker = boardPositionMarker;
-    }
-
-    public char getBoardPositionMarker() {
-        return boardPositionMarker;
+    public ArrayList<State.Card> getGone(){
+        return gone;
     }
 
     @Override

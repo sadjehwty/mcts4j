@@ -3,50 +3,60 @@ package dev.macrobug.mcts4j.games.tarot;
 import io.github.nejc92.mcts.MctsDomainState;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-public class State implements MctsDomainState<String, Player> {
-
-    private static final int BOARD_SIZE = 3;
-    private static final char EMPTY_BOARD_POSITION = '-';
-    private static final int ACTION_ROW_POSITION = 0;
-    private static final int ACTION_COLUMN_POSITION = 1;
-    private static final int FINAL_ROUND = 9;
-
-    private char[][] board;
+public class State implements MctsDomainState<Card, Player> {
+    public enum Suit{
+        SPADE,
+        COPPE,
+        DENARI,
+        BASTONI,
+        TRIONFI
+    }
+    public record Card(int value,Suit suit){}
+    public record Game(Suit semeDiMano,int firstPlayerIndex, Card first, Card second, Card third, Card fourth){}
+    private ArrayList<Card> preseNS= new ArrayList<>();
+    private ArrayList<Card> preseEW= new ArrayList<>();
+    private ArrayList<Game> games = new ArrayList<>();
     private final Player[] players;
-    private int currentPlayerIndex;
-    private int previousPlayerIndex;
-    private int currentRound;
+    private static final ArrayList<Card> allCards = initializeDeck();
 
-    public static State initialize(Player.Type playerToBegin) {
-        char[][] board = initializeEmptyBoard();
-        Player[] players = initializePlayers();
-        int currentPlayerIndex = getPlayerToBeginIndex(playerToBegin);
-        return new State(board, players, currentPlayerIndex);
+    public static State initialize(int firstPlayer) {
+        Player[] players = initializePlayers(firstPlayer);
+        return new State(new Game(null,(firstPlayer+1)%4,null,null, null,null), players);
     }
 
-    private State(char[][] board, Player[] players, int currentPlayerIndex) {
-        this.board = board;
+    private State(Game game, Player[] players) {
         this.players = players;
-        this.currentPlayerIndex = currentPlayerIndex;
-        this.previousPlayerIndex = 2 - currentPlayerIndex - 1;
-        this.currentRound = 0;
+        games.add(game);
     }
 
-    private static char[][] initializeEmptyBoard() {
-        char[][] board = new char[BOARD_SIZE][BOARD_SIZE];
-        for (int row = 0; row < BOARD_SIZE; row++) {
-            Arrays.fill(board[row], EMPTY_BOARD_POSITION);
+    private static ArrayList<Card> initializeDeck() {
+        ArrayList<Card> deck= new ArrayList<>();
+        for(Suit suit: Suit.values()){
+            if(suit==Suit.TRIONFI){
+                deck.add(new Card(0,suit));
+                deck.add(new Card(1,suit));
+                for(int i=0;i<4;i++)
+                    deck.add(new Card(4,suit));
+                for(int i=5;i<22;i++)
+                    deck.add(new Card(i,suit));
+            }else{
+                deck.add(new Card(1,suit));
+                for(int i=6;i<15;i++)
+                    deck.add(new Card(i,suit));
+            }
         }
-        return board;
+        return deck;
     }
 
-    private static Player[] initializePlayers() {
-        Player[] players = new Player[2];
-        players[0] = Player.create(Player.Type.NOUGHT);
-        players[1] = Player.create(Player.Type.CROSS);
+    private static Player[] initializePlayers(int firstPlayer) {
+        Player[] players = new Player[4];
+        ArrayList<Card> temp = (ArrayList<Card>) State.allCards.clone();
+        int delta = 3-firstPlayer;
+        for(int i=0;i<4;i++){
+            players[(i+delta)%4] = Player.create(temp.subList(i*15,i<3?15:17));
+        }
         return players;
     }
 
@@ -157,6 +167,11 @@ public class State implements MctsDomainState<String, Player> {
             availableActions.addAll(availableActionsInRow);
         }
         return availableActions;
+    }
+
+    @Override
+    public State performActionForCurrentAgent(Card card) {
+        return null;
     }
 
     private List<String> getAvailableActionsInBoardRow(char[] row, int rowIndex) {

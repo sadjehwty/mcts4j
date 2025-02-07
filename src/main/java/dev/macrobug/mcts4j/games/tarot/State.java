@@ -4,6 +4,8 @@ import io.github.nejc92.mcts.MctsDomainState;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 public class State implements MctsDomainState<Card, Player> {
     public enum Suit{
@@ -52,7 +54,10 @@ public class State implements MctsDomainState<Card, Player> {
 
     private static Player[] initializePlayers(int firstPlayer) {
         Player[] players = new Player[4];
-        ArrayList<Card> temp = (ArrayList<Card>) State.allCards.clone();
+        Random rand = new Random(System.currentTimeMillis());
+        List<Card> temp = new ArrayList<>(State.allCards.size());
+        temp.addAll(State.allCards);
+        temp = temp.stream().sorted((a,b)-> Double.compare(rand.nextDouble(), 0.5)).collect(Collectors.toList());
         int delta = 3-firstPlayer;
         for(int i=0;i<4;i++){
             players[(i+delta)%4] = Player.create(temp.subList(i*15,i<3?15:17));
@@ -60,6 +65,7 @@ public class State implements MctsDomainState<Card, Player> {
         return players;
     }
 
+    // TODO DA QUI IN POI
     private static int getPlayerToBeginIndex(Player.Type playerToBegin) {
         switch (playerToBegin) {
             case NOUGHT:

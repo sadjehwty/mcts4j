@@ -6,13 +6,13 @@ import java.util.Collections;
 import java.util.List;
 
 public class Player implements MctsDomainAgent<State> {
-    private ArrayList<State.Card> deck;
-    private final ArrayList<State.Card> gone=new ArrayList<>();
+    private ArrayList<Card> deck;
+    private final ArrayList<Card> gone=new ArrayList<>();
 
-    public Player(ArrayList<State.Card> deck) {
+    public Player(ArrayList<Card> deck) {
         this.deck=deck;
     }
-    public ArrayList<State.Card> getGone(){
+    public ArrayList<Card> getGone(){
         return gone;
     }
 
@@ -25,23 +25,23 @@ public class Player implements MctsDomainAgent<State> {
         return state;
     }
 
-    private String getBiasedOrRandomActionFromStatesAvailableActions(State state) {
-        List<String> availableActions = state.getAvailableActionsForCurrentAgent();
-        for (String action : availableActions) {
+    private Card getBiasedOrRandomActionFromStatesAvailableActions(State state) {
+        List<Card> availableActions = state.getAvailableActionsForCurrentAgent();
+        for (Card action : availableActions) {
             if (actionWinsGame(state, action))
                 return action;
         }
         return getRandomActionFromActions(availableActions);
     }
 
-    private boolean actionWinsGame(State state, String action) {
+    private boolean actionWinsGame(State state, Card action) {
         state.performActionForCurrentAgent(action);
         boolean actionEndsGame = state.isTerminal();
         state.undoAction(action);
         return actionEndsGame;
     }
 
-    private String getRandomActionFromActions(List<String> actions) {
+    private Card getRandomActionFromActions(List<Card> actions) {
         Collections.shuffle(actions);
         return actions.get(0);
     }

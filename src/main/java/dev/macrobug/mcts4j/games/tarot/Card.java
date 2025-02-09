@@ -1,6 +1,12 @@
 package dev.macrobug.mcts4j.games.tarot;
 
 public class Card implements Comparable<Card>{
+    public final static Card MATTO=new Card(0,Suit.TRIONFI);
+    public final static Card BEGATTO=new Card(1,Suit.TRIONFI);
+    public final static Card ANGELO=new Card(21,Suit.TRIONFI);
+    public final static Card MONDO=new Card(20,Suit.TRIONFI);
+
+
     private final int value;
     private final Suit suit;
 

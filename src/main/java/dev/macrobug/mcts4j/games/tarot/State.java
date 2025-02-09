@@ -16,6 +16,83 @@ public class State implements MctsDomainState<Card, Player> {
 
     // TODO da implementare
     public static int getPoints(ArrayList<Card> prese) {
+        int trionfi=0;
+        int contatori=0;
+        int nrSerie=0;
+        int totSerie=0;
+        int nrScavezzo=0;
+        int totScavezzo=0;
+        if(prese.contains(Card.MATTO)){
+            trionfi++;
+            contatori++;
+        }
+        if(prese.contains(Card.BEGATTO)){
+            trionfi++;
+            contatori++;
+        }
+        // SERIE
+        for(Suit suit:Suit.values()){
+            if(suit.equals(Suit.TRIONFI)){
+                if(prese.contains(Card.ANGELO)){
+                    int nr=0;
+                    int tmpContatori=contatori;
+                    boolean done=false;
+                    for(int i=17;i<20;i++)
+                        if(prese.contains(new Card(i,suit)))
+                            nr++;
+                    if(nr>1) done=true;
+                    else if(tmpContatori>0){
+                        done=true;
+                        tmpContatori--;
+                    }
+                    if(done){
+                        nrSerie++;
+                        totSerie+=nr;
+                        boolean skip=false;
+                        // TODO così facendo non conto i moretti
+                        for(int i=16;i>=4;i--){
+                            if(prese.contains(new Card(i,suit))) {
+                                totSerie++;
+                                skip=false;
+                            }else if(tmpContatori>0 && !skip){
+                                totSerie++;
+                                skip=true;
+                                tmpContatori--;
+                            }else
+                                break;
+                        }
+                    }
+                }
+            }else{
+                if(prese.contains(new Card(14,suit))){
+                    int nr=0;
+                    int tmpContatori=contatori;
+                    boolean done=false;
+                    for(int i=11;i<14;i++)
+                        if(prese.contains(new Card(i,suit)))
+                            nr++;
+                    if(nr>1) done=true;
+                    else if(tmpContatori>0){
+                        done=true;
+                        tmpContatori--;
+                    }
+                    if(done){
+                        nrSerie++;
+                        totSerie+=nr;
+                        totSerie+=tmpContatori;
+                        if(prese.contains(new Card(1,suit)))
+                            totSerie++;
+                    }
+                }
+            }
+        }
+        // SCAVEZZO
+        if(prese.contains(Card.ANGELO)){
+            trionfi++;
+        }
+        if(prese.contains(Card.MONDO)){
+            trionfi++;
+        }
         return 87;
     }
 
@@ -43,7 +120,7 @@ public class State implements MctsDomainState<Card, Player> {
                 deck.add(new Card(1,suit));
                 for(int i=0;i<4;i++)
                     deck.add(new Card(4,suit));
-                for(int i=5;i<22;i++)
+                for(int i=5;i<21;i++)
                     deck.add(new Card(i,suit));
             }else{
                 deck.add(new Card(1,suit));
@@ -139,14 +216,13 @@ public class State implements MctsDomainState<Card, Player> {
     private Indici getIndici(Game current){
         boolean trionfo=false;
         Card[] cards = current.getCards();
-        Card matto = new Card(0,Suit.TRIONFI);
         int delta=0;
         Card max = cards[0];
         int indiceMatto=-1;
         List<Card> presa=new ArrayList<>();
         for(int i=0;i<4;i++){
             Card card=cards[i];
-            if(card.equals(matto)) {
+            if(card.equals(Card.MATTO)) {
                 indiceMatto=i;
             }else {
                 presa.add(card);
@@ -170,13 +246,12 @@ public class State implements MctsDomainState<Card, Player> {
         return new Indici(indiceMatto,delta,presa);
     }
     private Game generateNextGame(Game current){
-        Card matto = new Card(0,Suit.TRIONFI);
         Indici indici=getIndici(current);
         if(indici.matto>=0) {
             if ((indici.matto + current.getFirstPlayerIndex()) % 2 == 0)
-                preseNS.add(matto);
+                preseNS.add(Card.MATTO);
             else
-                preseEW.add(matto);
+                preseEW.add(Card.MATTO);
         }
         if ((indici.delta + current.getFirstPlayerIndex()) % 2 == 0)
             preseNS.addAll(indici.presa);
@@ -185,13 +260,12 @@ public class State implements MctsDomainState<Card, Player> {
         return new Game((indici.matto + current.getFirstPlayerIndex()) % 4);
     }
     private void destroyGame(Game current){
-        Card matto = new Card(0,Suit.TRIONFI);
         Indici indici=getIndici(current);
         if(indici.matto>=0) {
             if ((indici.matto + current.getFirstPlayerIndex()) % 2 == 0)
-                preseNS.remove(matto);
+                preseNS.remove(Card.MATTO);
             else
-                preseEW.remove(matto);
+                preseEW.remove(Card.MATTO);
         }
         if ((indici.delta + current.getFirstPlayerIndex()) % 2 == 0)
             preseNS.removeAll(indici.presa);

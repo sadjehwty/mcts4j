@@ -2,15 +2,17 @@ package dev.macrobug.mcts4j.games.tarot;
 import io.github.nejc92.mcts.MctsDomainAgent;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 public class Player implements MctsDomainAgent<State> {
-    private ArrayList<Card> deck;
+    private final int position;
+    private final ArrayList<Card> deck;
     private final ArrayList<Card> gone=new ArrayList<>();
 
-    public Player(ArrayList<Card> deck) {
+    public Player(ArrayList<Card> deck,int position) {
         this.deck=deck;
+        this.position = position;
     }
     public ArrayList<Card> getGone(){
         return gone;
@@ -20,7 +22,7 @@ public class Player implements MctsDomainAgent<State> {
     @Override
     public State getTerminalStateByPerformingSimulationFromState(State state) {
         while (!state.isTerminal()) {
-            String action = getBiasedOrRandomActionFromStatesAvailableActions(state);
+            Card action = getBiasedOrRandomActionFromStatesAvailableActions(state);
             state.performActionForCurrentAgent(action);
         }
         return state;
@@ -43,17 +45,12 @@ public class Player implements MctsDomainAgent<State> {
     }
 
     private Card getRandomActionFromActions(List<Card> actions) {
-        Collections.shuffle(actions);
-        return actions.get(0);
+        Random rand = new Random(System.currentTimeMillis());
+        return actions.stream().sorted((_, _)-> Double.compare(rand.nextDouble(), 0.5)).toList().getFirst();
     }
 
     @Override
     public double getRewardFromTerminalState(State terminalState) {
-        if (terminalState.specificPlayerWon(this))
-            return 1;
-        else if (terminalState.isDraw())
-            return 0.5;
-        else
-            return 0;
+        return (position %2==0 ? 1 : -1) * State.getPoints(terminalState.getPreseNS())-State.getPoints(terminalState.getPreseEW());
     }
 }

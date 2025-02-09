@@ -1,3 +1,28 @@
 package dev.macrobug.mcts4j.games.tarot;
 
-public record Card(int value,Suit suit){}
+public class Card implements Comparable<Card>{
+    private final int value;
+    private final Suit suit;
+
+    public Suit suit(){return suit;}
+    public int value(){return value;}
+
+    public Card(int value, Suit suit){
+        this.value=value;
+        this.suit=suit;
+    }
+    public boolean equals(Card c){
+        return c.suit.equals(suit) && c.value==value;
+    }
+    @Override
+    public int compareTo(Card card) {
+        if(suit.equals(card.suit)){
+            return switch (suit){
+                case TRIONFI -> value>=card.value?1:-1;
+                case COPPE, DENARI ->value<11 && card.value<11 ? 1-Integer.compare(value,card.value) :Integer.compare(value,card.value);
+                case BASTONI, SPADE ->Integer.compare(value,card.value);
+            };
+        }else if(suit.equals(Suit.TRIONFI) || !card.suit.equals(Suit.TRIONFI)) return 1;
+        return -1;
+    }
+}

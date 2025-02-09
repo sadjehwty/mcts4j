@@ -11,8 +11,8 @@ public class Main {
         Mcts<State, Card, Player> mcts = Mcts.initializeIterations(15000);
         for(int turn=0;!state.isTerminal();turn++) {
             Card action;
-            /*if(turn%2==1) action = sc.nextLine();
-            else*/ action = mcts.uctSearchWithExploration(state,1.5);
+            if(turn%2==1) action = Card.parse(sc.nextLine());
+            else action = mcts.uctSearchWithExploration(state,1.5);
             state.performActionForCurrentAgent(action);
             Card[] cards=state.getCurrentGame().getCards();
             for(int i=3;i>=0;i--){

@@ -4,6 +4,10 @@ public class Card implements Comparable<Card>{
     private final int value;
     private final Suit suit;
 
+    public static Card parse(String s) {
+        return new Card(Integer.parseInt(s.substring(0,2)),Suit.parse(s.substring(2)));
+    }
+
     public Suit suit(){return suit;}
     public int value(){return value;}
 

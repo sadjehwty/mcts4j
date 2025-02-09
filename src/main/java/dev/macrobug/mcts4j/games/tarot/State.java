@@ -14,6 +14,17 @@ public class State implements MctsDomainState<Card, Player> {
     private final Player[] players;
     private static final ArrayList<Card> allCards = initializeDeck();
 
+    // TODO da implementare
+    public static int getPoints(ArrayList<Card> prese) {
+        return 87;
+    }
+
+    public Game getCurrentGame(){
+        return games.getLast();
+    }
+    public ArrayList<Card> getPreseNS(){return preseNS;}
+    public ArrayList<Card> getPreseEW(){return preseEW;}
+
     public static State initialize(int firstPlayer) {
         Player[] players = initializePlayers(firstPlayer);
         return new State(new Game((firstPlayer+1)%4), players);
@@ -48,10 +59,10 @@ public class State implements MctsDomainState<Card, Player> {
         Random rand = new Random(System.currentTimeMillis());
         List<Card> temp = new ArrayList<>(State.allCards.size());
         temp.addAll(State.allCards);
-        temp = temp.stream().sorted((a,b)-> Double.compare(rand.nextDouble(), 0.5)).collect(Collectors.toList());
+        temp = temp.stream().sorted((_, _)-> Double.compare(rand.nextDouble(), 0.5)).collect(Collectors.toList());
         int delta = 3-firstPlayer;
         for(int i=0;i<4;i++){
-            players[(i+delta)%4] = Player.create(temp.subList(i*15,i<3?15:17));
+            players[(i+delta)%4] = new Player((ArrayList<Card>) temp.subList(i*15,i<3?15:17),i);
         }
         return players;
     }
@@ -169,42 +180,37 @@ public class State implements MctsDomainState<Card, Player> {
         return new Game((delta + current.getFirstPlayerIndex()) % 4);
     }
 
-    // TODO fino qui
-
-    protected MctsDomainState undoAction(String action) {
+    protected State undoAction(Card action) {
         validateIsValidUndoAction(action);
         applyUndoActionOnBoard(action);
-        selectNextPlayer();
-        currentRound--;
         return this;
     }
 
-    private void validateIsValidUndoAction(String action) {
-        int row = getRowFromAction(action);
-        int column = getColumnFromAction(action);
-        if (!(-1 < row && row < 3) && !(-1 < column && column < 3))
-            throw new IllegalArgumentException("Error: invalid action passed as function parameter");
+    private void validateIsValidUndoAction(Card action) {
+        Game current=getCurrentGame();
+        if(!current.isStarted()){
+            current=games.get(games.size()-2);
+        }
+        Card[] cards=current.getCards();
+        for(int i=3;i>=0;i--) {
+            Card c=cards[i];
+            if (c!=null){
+                if(!c.equals(action))
+                    throw new IllegalArgumentException("Error: invalid action passed as function parameter");
+                break;
+            }
+        }
     }
-
-    private void applyUndoActionOnBoard(String action) {
-        int row = getRowFromAction(action);
-        int column = getColumnFromAction(action);
-        board[row][column] = EMPTY_BOARD_POSITION;
-    }
-
-    private int getRowFromAction(String action) {
-        String row = action.split("")[ACTION_ROW_POSITION];
-        return Integer.parseInt(row);
-    }
-
-    private int getColumnFromAction(String action) {
-        String column = action.split("")[ACTION_COLUMN_POSITION];
-        return Integer.parseInt(column);
-    }
-
-    private void selectNextPlayer() {
-        currentPlayerIndex = 2 - currentPlayerIndex - 1;
-        previousPlayerIndex = 2 - previousPlayerIndex - 1;
+    private void applyUndoActionOnBoard(Card card) {
+        Game current=getCurrentGame();
+        if(!current.isStarted()){
+            games.removeLast();
+            current=getCurrentGame();
+        }
+        Player currentPlayer = getCurrentAgent();
+        currentPlayer.getDeck().add(card);
+        currentPlayer.getGone().remove(card);
+        current.setCurrent(null);
     }
 
     @Override

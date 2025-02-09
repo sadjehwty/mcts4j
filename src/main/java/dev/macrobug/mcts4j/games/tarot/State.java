@@ -16,7 +16,7 @@ public class State implements MctsDomainState<Card, Player> {
 
     public static State initialize(int firstPlayer) {
         Player[] players = initializePlayers(firstPlayer);
-        return new State(new Game(null,(firstPlayer+1)%4,null,null, null,null), players);
+        return new State(new Game((firstPlayer+1)%4), players);
     }
 
     private State(Game game, Player[] players) {
@@ -63,7 +63,7 @@ public class State implements MctsDomainState<Card, Player> {
 
     private int getCurrentIndex(){
         Game current = games.getLast();
-        int delta = current.firstPlayerIndex();
+        int delta = current.getFirstPlayerIndex();
         if(current.first()!=null) delta++;
         if(current.second()!=null) delta++;
         if(current.third()!=null) delta++;
@@ -77,9 +77,9 @@ public class State implements MctsDomainState<Card, Player> {
     @Override
     public Player getPreviousAgent() {
         Game current = games.getLast();
-        if(current.first()==null) {
+        if(!current.isStarted()) {
             current = games.get(games.size() - 2);
-            return players[(current.firstPlayerIndex()+3)%4];
+            return players[(current.getFirstPlayerIndex()+3)%4];
         }else {
             int currentIndex=getCurrentIndex();
             if(currentIndex==0) currentIndex=4;
@@ -98,7 +98,7 @@ public class State implements MctsDomainState<Card, Player> {
         Game currentGame = games.getLast();
         Player currentPlayer = getCurrentAgent();
         List<Card> availableActions = currentPlayer.getDeck();
-        if(currentGame.firstPlayerIndex()!=getCurrentIndex()){
+        if(currentGame.getFirstPlayerIndex()!=getCurrentIndex()){
             if(availableActions.stream().anyMatch((c)->c.suit().equals(currentGame.semeDiMano())))
                 availableActions=availableActions.stream().filter((c)->c.suit().equals(currentGame.semeDiMano())).toList();
             else if (availableActions.stream().anyMatch((c)->c.suit().equals(Suit.TRIONFI)))
@@ -170,16 +170,16 @@ public class State implements MctsDomainState<Card, Player> {
             }
         }
         if(indiceMatto>=0) {
-            if ((indiceMatto + current.firstPlayerIndex()) % 2 == 0)
+            if ((indiceMatto + current.getFirstPlayerIndex()) % 2 == 0)
                 preseNS.add(matto);
             else
                 preseEW.add(matto);
         }
-        if ((delta + current.firstPlayerIndex()) % 2 == 0)
+        if ((delta + current.getFirstPlayerIndex()) % 2 == 0)
             preseNS.addAll(presa);
         else
             preseEW.addAll(presa);
-        return new Game(null, (delta + current.firstPlayerIndex()) % 4,null,null,null,null);
+        return new Game(null, (delta + current.getFirstPlayerIndex()) % 4,null,null,null,null);
     }
 
     // TODO fino qui

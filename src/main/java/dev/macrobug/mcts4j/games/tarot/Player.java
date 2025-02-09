@@ -15,6 +15,7 @@ public class Player implements MctsDomainAgent<State> {
     public ArrayList<Card> getGone(){
         return gone;
     }
+    public ArrayList<Card> getDeck(){return deck;}
 
     @Override
     public State getTerminalStateByPerformingSimulationFromState(State state) {

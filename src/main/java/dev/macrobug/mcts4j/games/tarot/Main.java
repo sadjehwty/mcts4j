@@ -14,15 +14,21 @@ public class Main {
             /*if(turn%2==1) action = sc.nextLine();
             else*/ action = mcts.uctSearchWithExploration(state,1.5);
             state.performActionForCurrentAgent(action);
-            char[][] board=state.getBoard();
-            for (char[] chars : board) {
-                for (char aChar : chars) {
-                    System.out.print(aChar + " ");
-                }
+            Card[] cards=state.getCurrentGame().getCards();
+            for(int i=3;i>=0;i--){
+                Card card=cards[i];
+                StringBuffer stringBuffer=new StringBuffer("         ");
+                int start=switch (i){
+                    case 1->0;
+                    case 2->6;
+                    default->3;
+                };
+                if(card!=null)
+                    stringBuffer.replace(start,start+3, card.toString());
+                System.out.println(stringBuffer);
                 System.out.println();
             }
-            if(state.isDraw()){System.out.println("===================");}
-            else if(!state.isTerminal()){System.out.println("-------------------");}
+            if(!state.isTerminal()){System.out.println("-------------------");}
         }
     }
 }

@@ -25,4 +25,9 @@ public class Card implements Comparable<Card>{
         }else if(suit.equals(Suit.TRIONFI) || !card.suit.equals(Suit.TRIONFI)) return 1;
         return -1;
     }
+
+    @Override
+    public String toString() {
+        return String.format("%2d%c",value,suit.toString().toCharArray()[0]);
+    }
 }

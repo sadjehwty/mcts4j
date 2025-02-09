@@ -8,9 +8,9 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 public class State implements MctsDomainState<Card, Player> {
-    private ArrayList<Card> preseNS= new ArrayList<>();
-    private ArrayList<Card> preseEW= new ArrayList<>();
-    private ArrayList<Game> games = new ArrayList<>();
+    private final ArrayList<Card> preseNS= new ArrayList<>();
+    private final ArrayList<Card> preseEW= new ArrayList<>();
+    private final ArrayList<Game> games = new ArrayList<>();
     private final Player[] players;
     private static final ArrayList<Card> allCards = initializeDeck();
 
@@ -214,7 +214,7 @@ public class State implements MctsDomainState<Card, Player> {
     }
 
     @Override
-    public MctsDomainState skipCurrentAgent() {
+    public State skipCurrentAgent() {
         return this;
     }
 }

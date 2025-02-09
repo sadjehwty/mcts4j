@@ -8,15 +8,6 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 public class State implements MctsDomainState<Card, Player> {
-    public enum Suit{
-        SPADE,
-        COPPE,
-        DENARI,
-        BASTONI,
-        TRIONFI
-    }
-    public record Card(int value,Suit suit){}
-    public record Game(Suit semeDiMano,int firstPlayerIndex, Card first, Card second, Card third, Card fourth){}
     private ArrayList<Card> preseNS= new ArrayList<>();
     private ArrayList<Card> preseEW= new ArrayList<>();
     private ArrayList<Game> games = new ArrayList<>();
@@ -65,99 +56,35 @@ public class State implements MctsDomainState<Card, Player> {
         return players;
     }
 
-    // TODO DA QUI IN POI
-    private static int getPlayerToBeginIndex(Player.Type playerToBegin) {
-        switch (playerToBegin) {
-            case NOUGHT:
-                return 0;
-            case CROSS:
-                return 1;
-            default:
-                throw new IllegalArgumentException("Error: invalid player type passed as function parameter");
-        }
-    }
-
-    protected void setBoard(char[][] board) {
-        this.board = board;
-    }
-
-    protected char[][] getBoard() {
-        return board;
-    }
-
-    protected void setCurrentRound(int round) {
-        this.currentRound = round;
-    }
-
     @Override
     public boolean isTerminal() {
-        return somePlayerWon() || isDraw();
+        return preseEW.size()+preseNS.size()==62;
     }
 
-    public boolean isDraw() {
-        return !somePlayerWon() && currentRound == FINAL_ROUND;
+    private int getCurrentIndex(){
+        Game current = games.getLast();
+        int delta = current.firstPlayerIndex();
+        if(current.first()!=null) delta++;
+        if(current.second()!=null) delta++;
+        if(current.third()!=null) delta++;
+        return delta%4;
     }
-
-    private boolean somePlayerWon() {
-        return specificPlayerWon(players[currentPlayerIndex])
-                || specificPlayerWon(players[previousPlayerIndex]);
-    }
-
-    protected boolean specificPlayerWon(Player player) {
-        return boardContainsPlayersFullRow(player)
-                || boardContainsPlayersFullColumn(player)
-                || boardContainsPlayersFullDiagonal(player);
-    }
-
-    private boolean boardContainsPlayersFullRow(Player player) {
-        for (int row = 0; row < BOARD_SIZE; row++) {
-            if (board[row][0] == player.getBoardPositionMarker()
-                    && board[row][1] == player.getBoardPositionMarker()
-                    && board[row][2] == player.getBoardPositionMarker())
-                return true;
-        }
-        return false;
-    }
-
-    private boolean boardContainsPlayersFullColumn(Player player) {
-        for (int column = 0; column < BOARD_SIZE; column++) {
-            if (board[0][column] == player.getBoardPositionMarker()
-                    && board[1][column] == player.getBoardPositionMarker()
-                    && board[2][column] == player.getBoardPositionMarker())
-                return true;
-        }
-        return false;
-    }
-
-    private boolean boardContainsPlayersFullDiagonal(Player player) {
-        return boardContainsPlayersFullAscendingDiagonal(player)
-                || boardContainsPlayersFullDescendingDiagonal(player);
-    }
-
-    private boolean boardContainsPlayersFullAscendingDiagonal(Player player) {
-        for (int i = 0; i < BOARD_SIZE; i++) {
-            if (board[i][BOARD_SIZE - 1 - i] != player.getBoardPositionMarker())
-                return false;
-        }
-        return true;
-    }
-
-    private boolean boardContainsPlayersFullDescendingDiagonal(Player player) {
-        for (int i = 0; i < BOARD_SIZE; i++) {
-            if (board[i][i] != player.getBoardPositionMarker())
-                return false;
-        }
-        return true;
-    }
-
     @Override
     public Player getCurrentAgent() {
-        return players[currentPlayerIndex];
+        return players[getCurrentIndex()];
     }
 
     @Override
     public Player getPreviousAgent() {
-        return players[previousPlayerIndex];
+        Game current = games.getLast();
+        if(current.first()==null) {
+            current = games.get(games.size() - 2);
+            return players[(current.firstPlayerIndex()+3)%4];
+        }else {
+            int currentIndex=getCurrentIndex();
+            if(currentIndex==0) currentIndex=4;
+            return players[currentIndex- 1];
+        }
     }
 
     @Override
@@ -165,8 +92,9 @@ public class State implements MctsDomainState<Card, Player> {
         return getAvailableActionsForCurrentAgent().size();
     }
 
+ // TODO fino qui
     @Override
-    public List<String> getAvailableActionsForCurrentAgent() {
+    public List<Card> getAvailableActionsForCurrentAgent() {
         List<String> availableActions = new ArrayList<>();
         for (int row = 0; row < BOARD_SIZE; row++) {
             List<String> availableActionsInRow = getAvailableActionsInBoardRow(board[row], row);

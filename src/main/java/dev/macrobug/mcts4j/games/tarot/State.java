@@ -92,57 +92,96 @@ public class State implements MctsDomainState<Card, Player> {
         return getAvailableActionsForCurrentAgent().size();
     }
 
- // TODO fino qui
     @Override
     public List<Card> getAvailableActionsForCurrentAgent() {
-        List<String> availableActions = new ArrayList<>();
-        for (int row = 0; row < BOARD_SIZE; row++) {
-            List<String> availableActionsInRow = getAvailableActionsInBoardRow(board[row], row);
-            availableActions.addAll(availableActionsInRow);
+        Game currentGame = games.getLast();
+        Player currentPlayer = getCurrentAgent();
+        List<Card> availableActions = currentPlayer.getDeck();
+        if(currentGame.firstPlayerIndex()!=getCurrentIndex()){
+            if(availableActions.stream().anyMatch((c)->c.suit().equals(currentGame.semeDiMano())))
+                availableActions=availableActions.stream().filter((c)->c.suit().equals(currentGame.semeDiMano())).toList();
+            else if (availableActions.stream().anyMatch((c)->c.suit().equals(Suit.TRIONFI)))
+                availableActions=availableActions.stream().filter((c)->c.suit().equals(Suit.TRIONFI)).toList();
         }
         return availableActions;
     }
 
     @Override
     public State performActionForCurrentAgent(Card card) {
-        return null;
-    }
-
-    private List<String> getAvailableActionsInBoardRow(char[] row, int rowIndex) {
-        List<String> availableActionsInRow = new ArrayList<>();
-        for (int columnIndex = 0; columnIndex < BOARD_SIZE; columnIndex++) {
-            if (row[columnIndex] == EMPTY_BOARD_POSITION) {
-                String action = generateActionFromBoardPosition(rowIndex, columnIndex);
-                availableActionsInRow.add(action);
-            }
-        }
-        return availableActionsInRow;
-    }
-
-    private String generateActionFromBoardPosition(int row, int column) {
-        return Integer.toString(row) + Integer.toString(column);
-    }
-
-    @Override
-    public MctsDomainState performActionForCurrentAgent(String action) {
-        validateIsValidAction(action);
-        applyActionOnBoard(action);
-        selectNextPlayer();
-        currentRound++;
+        validateIsValidAction(card);
+        applyActionOnBoard(card);
         return this;
     }
-
-    private void validateIsValidAction(String action) {
+    private void validateIsValidAction(Card action) {
         if (!getAvailableActionsForCurrentAgent().contains(action)) {
             throw new IllegalArgumentException("Error: invalid action passed as function parameter");
         }
     }
 
-    private void applyActionOnBoard(String action) {
-        int row = getRowFromAction(action);
-        int column = getColumnFromAction(action);
-        board[row][column] = players[currentPlayerIndex].getBoardPositionMarker();
+    private void applyActionOnBoard(Card card) {
+        Game currentGame = games.getLast();
+        Player currentPlayer = getCurrentAgent();
+        currentPlayer.getDeck().remove(card);
+        currentPlayer.getGone().add(card);
+        if(currentGame.first()==null) currentGame.first=card;
+        else if (currentGame.second()==null) currentGame.second=card;
+        else if(currentGame.third()==null) currentGame.third=card;
+        else {
+            currentGame.fourth=card;
+            games.add(generateNextGame(currentGame));
+        }
     }
+    private Game generateNextGame(Game current){
+        boolean trionfo=false;
+        Card[] cards = new Card[]{
+                current.first(),
+                current.second(),
+                current.third(),
+                current.fourth()
+        };
+
+        Card matto = new Card(0,Suit.TRIONFI);
+        int delta=0;
+        Card max = cards[0];
+        int indiceMatto=-1;
+        List<Card> presa=new ArrayList<>();
+        for(int i=0;i<4;i++){
+            Card card=cards[i];
+            if(card.equals(matto)) {
+                indiceMatto=i;
+            }else {
+                presa.add(card);
+                if (trionfo) {
+                    if(card.suit().equals(Suit.TRIONFI) && max.compareTo(card)<0){
+                        delta = i;
+                        max = card;
+                    }
+                } else {
+                    if (card.suit().equals(Suit.TRIONFI)) {
+                        trionfo = true;
+                        delta = i;
+                        max = card;
+                    } else if (card.suit().equals(current.semeDiMano()) && max.compareTo(card)<0) {
+                        delta = i;
+                        max = card;
+                    }
+                }
+            }
+        }
+        if(indiceMatto>=0) {
+            if ((indiceMatto + current.firstPlayerIndex()) % 2 == 0)
+                preseNS.add(matto);
+            else
+                preseEW.add(matto);
+        }
+        if ((delta + current.firstPlayerIndex()) % 2 == 0)
+            preseNS.addAll(presa);
+        else
+            preseEW.addAll(presa);
+        return new Game(null, (delta + current.firstPlayerIndex()) % 4,null,null,null,null);
+    }
+
+    // TODO fino qui
 
     protected MctsDomainState undoAction(String action) {
         validateIsValidUndoAction(action);

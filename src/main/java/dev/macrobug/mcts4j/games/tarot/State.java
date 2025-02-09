@@ -92,6 +92,7 @@ public class State implements MctsDomainState<Card, Player> {
         return getAvailableActionsForCurrentAgent().size();
     }
 
+    // TODO modificarlo per rendere l'informazione incompleta
     @Override
     public List<Card> getAvailableActionsForCurrentAgent() {
         Game currentGame = games.getLast();

@@ -135,10 +135,10 @@ public class State implements MctsDomainState<Card, Player> {
         if(currentGame.isDone())
             games.add(generateNextGame(currentGame));
     }
-    private Game generateNextGame(Game current){
+    private record Indici(int matto, int delta,List<Card> presa){}
+    private Indici getIndici(Game current){
         boolean trionfo=false;
         Card[] cards = current.getCards();
-
         Card matto = new Card(0,Suit.TRIONFI);
         int delta=0;
         Card max = cards[0];
@@ -167,17 +167,36 @@ public class State implements MctsDomainState<Card, Player> {
                 }
             }
         }
-        if(indiceMatto>=0) {
-            if ((indiceMatto + current.getFirstPlayerIndex()) % 2 == 0)
+        return new Indici(indiceMatto,delta,presa);
+    }
+    private Game generateNextGame(Game current){
+        Card matto = new Card(0,Suit.TRIONFI);
+        Indici indici=getIndici(current);
+        if(indici.matto>=0) {
+            if ((indici.matto + current.getFirstPlayerIndex()) % 2 == 0)
                 preseNS.add(matto);
             else
                 preseEW.add(matto);
         }
-        if ((delta + current.getFirstPlayerIndex()) % 2 == 0)
-            preseNS.addAll(presa);
+        if ((indici.delta + current.getFirstPlayerIndex()) % 2 == 0)
+            preseNS.addAll(indici.presa);
         else
-            preseEW.addAll(presa);
-        return new Game((delta + current.getFirstPlayerIndex()) % 4);
+            preseEW.addAll(indici.presa);
+        return new Game((indici.matto + current.getFirstPlayerIndex()) % 4);
+    }
+    private void destroyGame(Game current){
+        Card matto = new Card(0,Suit.TRIONFI);
+        Indici indici=getIndici(current);
+        if(indici.matto>=0) {
+            if ((indici.matto + current.getFirstPlayerIndex()) % 2 == 0)
+                preseNS.remove(matto);
+            else
+                preseEW.remove(matto);
+        }
+        if ((indici.delta + current.getFirstPlayerIndex()) % 2 == 0)
+            preseNS.removeAll(indici.presa);
+        else
+            preseEW.removeAll(indici.presa);
     }
 
     protected State undoAction(Card action) {
@@ -206,6 +225,9 @@ public class State implements MctsDomainState<Card, Player> {
         if(!current.isStarted()){
             games.removeLast();
             current=getCurrentGame();
+        }
+        if(current.isDone()){
+            destroyGame(current);
         }
         Player currentPlayer = getCurrentAgent();
         currentPlayer.getDeck().add(card);

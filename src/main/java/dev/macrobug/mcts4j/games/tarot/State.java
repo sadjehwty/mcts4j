@@ -63,11 +63,7 @@ public class State implements MctsDomainState<Card, Player> {
 
     private int getCurrentIndex(){
         Game current = games.getLast();
-        int delta = current.getFirstPlayerIndex();
-        if(current.first()!=null) delta++;
-        if(current.second()!=null) delta++;
-        if(current.third()!=null) delta++;
-        return delta%4;
+        return current.getTurn();
     }
     @Override
     public Player getCurrentAgent() {
@@ -124,22 +120,13 @@ public class State implements MctsDomainState<Card, Player> {
         Player currentPlayer = getCurrentAgent();
         currentPlayer.getDeck().remove(card);
         currentPlayer.getGone().add(card);
-        if(currentGame.first()==null) currentGame.first=card;
-        else if (currentGame.second()==null) currentGame.second=card;
-        else if(currentGame.third()==null) currentGame.third=card;
-        else {
-            currentGame.fourth=card;
+        currentGame.setCurrent(card);
+        if(currentGame.isDone())
             games.add(generateNextGame(currentGame));
-        }
     }
     private Game generateNextGame(Game current){
         boolean trionfo=false;
-        Card[] cards = new Card[]{
-                current.first(),
-                current.second(),
-                current.third(),
-                current.fourth()
-        };
+        Card[] cards = current.getCards();
 
         Card matto = new Card(0,Suit.TRIONFI);
         int delta=0;
@@ -179,7 +166,7 @@ public class State implements MctsDomainState<Card, Player> {
             preseNS.addAll(presa);
         else
             preseEW.addAll(presa);
-        return new Game(null, (delta + current.getFirstPlayerIndex()) % 4,null,null,null,null);
+        return new Game((delta + current.getFirstPlayerIndex()) % 4);
     }
 
     // TODO fino qui

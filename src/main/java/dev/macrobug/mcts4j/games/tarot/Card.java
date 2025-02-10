@@ -21,8 +21,8 @@ public class Card implements Comparable<Card>{
         this.value=value;
         this.suit=suit;
     }
-    public boolean equals(Card c){
-        return c.suit.equals(suit) && c.value==value;
+    public boolean equals(Object o){
+        return o instanceof Card c && c.suit.equals(suit) && c.value == value;
     }
     @Override
     public int compareTo(Card card) {

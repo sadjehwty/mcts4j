@@ -49,8 +49,8 @@ public class State implements MctsDomainState<Card, Player> {
                         nrSerie++;
                         totSerie+=nr;
                         boolean skip=false;
-                        // TODO così facendo non conto i moretti
-                        for(int i=16;i>=4;i--){
+                        boolean end=false;
+                        for(int i=16;i>=5;i--){
                             if(prese.contains(new Card(i,suit))) {
                                 totSerie++;
                                 skip=false;
@@ -58,8 +58,22 @@ public class State implements MctsDomainState<Card, Player> {
                                 totSerie++;
                                 skip=true;
                                 tmpContatori--;
-                            }else
+                            }else {
+                                end=true;
                                 break;
+                            }
+                        }
+                        if(!end) {
+                            // i moretti fanno caso a sé
+                            long nrMoretti = prese.stream().filter((c) -> c.equals(Card.MORETTO)).count();
+                            if(nrMoretti>0){
+                                if(nrMoretti==4){
+                                    totSerie+= (int) nrMoretti;
+                                    totSerie+=tmpContatori;
+                                } else if(tmpContatori>0){
+                                    totScavezzo++;
+                                }
+                            }
                         }
                     }
                 }
@@ -85,6 +99,16 @@ public class State implements MctsDomainState<Card, Player> {
                     }
                 }
             }
+            long nrMoretti = prese.stream().filter((c) -> c.equals(Card.MORETTO)).count();
+            if(nrMoretti>2 || (nrMoretti==2 && contatori>0)){
+                nrSerie++;
+                totSerie+=nrMoretti+contatori;
+            }
+            long nrAssi = prese.stream().filter((c) -> c.value()==1 && !c.suit().equals(Suit.TRIONFI)).count();
+            if(nrAssi>2 || (nrAssi==2 && contatori>0)){
+                nrSerie++;
+                totSerie+=nrAssi+contatori;
+            }
         }
         // SCAVEZZO
         if(prese.contains(Card.ANGELO)){
@@ -93,7 +117,29 @@ public class State implements MctsDomainState<Card, Player> {
         if(prese.contains(Card.MONDO)){
             trionfi++;
         }
-        return 87;
+        if(trionfi>2){
+            nrScavezzo++;
+            totScavezzo+=18*(trionfi>3?2:1);
+        }
+        for(Suit suit:Suit.values()){
+            if(!suit.equals(Suit.TRIONFI)){
+                for(int i=11;i<=14;i++){
+                    Card t = new Card(i,suit);
+                    long nr = prese.stream().filter((c) -> c.equals(t)).count();
+                    if(nr>2){
+                        nrScavezzo++;
+                        totScavezzo+=switch (i){
+                            case 11->12;
+                            case 12->13;
+                            case 13->14;
+                            case 14->17;
+                            default -> throw new IllegalStateException("Unexpected value: " + i);
+                        }*(nr>3?2:1);
+                    }
+                }
+            }
+        }
+        return totSerie*(nrSerie>2?10:5)+totScavezzo+(nrScavezzo>2?2:1);
     }
 
     public Game getCurrentGame(){

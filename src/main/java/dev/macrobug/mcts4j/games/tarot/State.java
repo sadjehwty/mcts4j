@@ -139,7 +139,9 @@ public class State implements MctsDomainState<Card, Player> {
         temp = temp.stream().sorted((_, _)-> Double.compare(rand.nextDouble(), 0.5)).collect(Collectors.toList());
         int delta = 3-firstPlayer;
         for(int i=0;i<4;i++){
-            players[(i+delta)%4] = new Player((ArrayList<Card>) temp.subList(i*15,i<3?15:17),i);
+            ArrayList<Card> x = new ArrayList<>();
+            x.addAll(temp.subList(i*15,(i<3?15:17)+(i*15)));
+            players[(i+delta)%4] = new Player(x,i);
         }
         return players;
     }

@@ -139,6 +139,7 @@ public class State implements MctsDomainState<Card, Player> {
                 }
             }
         }
+        // TODO CARTACCE
         return totSerie*(nrSerie>2?10:5)+totScavezzo+(nrScavezzo>2?2:1);
     }
 

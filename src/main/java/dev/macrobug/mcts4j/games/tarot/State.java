@@ -12,7 +12,7 @@ public class State implements MctsDomainState<Card, Player> {
     private final ArrayList<Card> preseEW= new ArrayList<>();
     private final ArrayList<Game> games = new ArrayList<>();
     private final Player[] players;
-    private static final ArrayList<Card> allCards = initializeDeck();
+    public static final ArrayList<Card> allCards = initializeDeck();
 
     // TODO da implementare
     public static int getPoints(ArrayList<Card> prese,Game game) {

@@ -16,6 +16,9 @@ public class State implements MctsDomainState<Card, Player> {
 
     // TODO da implementare
     public static int getPoints(ArrayList<Card> prese,Game game) {
+        // CAPPOTTO
+        if(prese.size()==1) prese.remove(Card.MATTO);
+        if(prese.size()==61) prese.add(Card.MATTO);
         int trionfi=0;
         int contatori=0;
         int nrSerie=0;

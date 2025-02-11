@@ -153,7 +153,7 @@ public class State implements MctsDomainState<Card, Player> {
         Card last=game.getCards()[3];
         if(last!=null && last.equals(Card.MATTO)) last=game.getCards()[2];
         int ultimaPresa = last!=null && prese.contains(last) ? 6 : 0;
-        return totSerie*(nrSerie>2?10:5)+totScavezzo+(nrScavezzo>2?2:1)+ultimaPresa+(nrDue*2)+(nrTre*3)+(nrQuattro*4)+(nrCinque+5)+nrUno;
+        return totSerie*(nrSerie>2?10:5)+totScavezzo*(nrScavezzo>2?2:1)+ultimaPresa+(nrDue*2)+(nrTre*3)+(nrQuattro*4)+(nrCinque*5)+nrUno;
     }
 
     public Game getCurrentGame(){

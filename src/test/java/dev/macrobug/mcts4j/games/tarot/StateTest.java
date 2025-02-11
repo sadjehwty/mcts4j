@@ -10,6 +10,6 @@ public class StateTest {
     @Test
     public void getPointsTest() {
         // NESSUNA PRESA
-        assertEquals(0, State.getPoints(new ArrayList<>()));
+        assertEquals(0, State.getPoints(new ArrayList<>(),new Game(0)));
     }
 }

@@ -15,7 +15,7 @@ public class State implements MctsDomainState<Card, Player> {
     private static final ArrayList<Card> allCards = initializeDeck();
 
     // TODO da implementare
-    public static int getPoints(ArrayList<Card> prese) {
+    public static int getPoints(ArrayList<Card> prese,Game game) {
         int trionfi=0;
         int contatori=0;
         int nrSerie=0;
@@ -99,17 +99,18 @@ public class State implements MctsDomainState<Card, Player> {
                     }
                 }
             }
-            long nrMoretti = prese.stream().filter((c) -> c.equals(Card.MORETTO)).count();
-            if(nrMoretti>2 || (nrMoretti==2 && contatori>0)){
-                nrSerie++;
-                totSerie+=nrMoretti+contatori;
-            }
-            long nrAssi = prese.stream().filter((c) -> c.value()==1 && !c.suit().equals(Suit.TRIONFI)).count();
-            if(nrAssi>2 || (nrAssi==2 && contatori>0)){
-                nrSerie++;
-                totSerie+=nrAssi+contatori;
-            }
         }
+        long nrMoretti = prese.stream().filter((c) -> c.equals(Card.MORETTO)).count();
+        if(nrMoretti>2 || (nrMoretti==2 && contatori>0)){
+            nrSerie++;
+            totSerie+=nrMoretti+contatori;
+        }
+        long nrAssi = prese.stream().filter((c) -> c.value()==1 && !c.suit().equals(Suit.TRIONFI)).count();
+        if(nrAssi>2 || (nrAssi==2 && contatori>0)){
+            nrSerie++;
+            totSerie+=nrAssi+contatori;
+        }
+
         // SCAVEZZO
         if(prese.contains(Card.ANGELO)){
             trionfi++;
@@ -121,26 +122,38 @@ public class State implements MctsDomainState<Card, Player> {
             nrScavezzo++;
             totScavezzo+=18*(trionfi>3?2:1);
         }
-        for(Suit suit:Suit.values()){
-            if(!suit.equals(Suit.TRIONFI)){
-                for(int i=11;i<=14;i++){
-                    Card t = new Card(i,suit);
-                    long nr = prese.stream().filter((c) -> c.equals(t)).count();
-                    if(nr>2){
-                        nrScavezzo++;
-                        totScavezzo+=switch (i){
-                            case 11->12;
-                            case 12->13;
-                            case 13->14;
-                            case 14->17;
-                            default -> throw new IllegalStateException("Unexpected value: " + i);
-                        }*(nr>3?2:1);
-                    }
-                }
+        for(int i=11;i<=14;i++){
+            final int f=i;
+            long nr = prese.stream().filter((c) -> c.value()==f).count();
+            if(nr>2){
+                nrScavezzo++;
+                totScavezzo+=switch (i){
+                    case 11->12;
+                    case 12->13;
+                    case 13->14;
+                    case 14->17;
+                    default -> throw new IllegalStateException("Unexpected value: " + i);
+                }*(nr>3?2:1);
             }
         }
-        // TODO CARTACCE
-        return totSerie*(nrSerie>2?10:5)+totScavezzo+(nrScavezzo>2?2:1);
+        // CARTACCE
+        int nrCinque = (int) prese.stream().filter((c)->c.equals(Card.BEGATTO) || c.equals(Card.MATTO) || c.equals(Card.MONDO) || c.equals(Card.ANGELO) || (!c.suit().equals(Suit.TRIONFI) && c.value()==14)).count();
+        int nrQuattro = (int) prese.stream().filter((c)-> !c.suit().equals(Suit.TRIONFI) && c.value()==13).count();
+        int nrTre = (int) prese.stream().filter((c)-> !c.suit().equals(Suit.TRIONFI) && c.value()==12).count();
+        int nrDue = (int) prese.stream().filter((c)-> !c.suit().equals(Suit.TRIONFI) && c.value()==11).count();
+        int nrUno = (int) prese.stream().filter((c)->
+                !c.equals(Card.BEGATTO) &&
+                !c.equals(Card.MATTO) &&
+                !c.equals(Card.MONDO) &&
+                !c.equals(Card.ANGELO) &&
+                (!c.suit().equals(Suit.TRIONFI) || c.value()<10)).count();
+        nrUno-=nrDue-nrTre-nrQuattro-nrCinque;
+        nrUno = prese.contains(Card.MATTO) ? Math.floorDiv(nrUno, 2) : Math.ceilDiv(nrUno, 2);
+        // ULTIMA PRESA
+        Card last=game.getCards()[3];
+        if(last!=null && last.equals(Card.MATTO)) last=game.getCards()[2];
+        int ultimaPresa = last!=null && prese.contains(last) ? 6 : 0;
+        return totSerie*(nrSerie>2?10:5)+totScavezzo+(nrScavezzo>2?2:1)+ultimaPresa+(nrDue*2)+(nrTre*3)+(nrQuattro*4)+(nrCinque+5)+nrUno;
     }
 
     public Game getCurrentGame(){
@@ -306,7 +319,7 @@ public class State implements MctsDomainState<Card, Player> {
             preseNS.addAll(indici.presa);
         else
             preseEW.addAll(indici.presa);
-        return new Game((indici.matto + current.getFirstPlayerIndex()) % 4);
+        return preseEW.size() + preseNS.size() ==62 ? current : new Game((indici.matto + current.getFirstPlayerIndex()) % 4);
     }
     private void destroyGame(Game current){
         Indici indici=getIndici(current);

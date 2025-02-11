@@ -51,6 +51,7 @@ public class Player implements MctsDomainAgent<State> {
 
     @Override
     public double getRewardFromTerminalState(State terminalState) {
-        return (position %2==0 ? 1 : -1) * State.getPoints(terminalState.getPreseNS())-State.getPoints(terminalState.getPreseEW());
+        Game game=terminalState.getCurrentGame();
+        return (position %2==0 ? 1 : -1) * State.getPoints(terminalState.getPreseNS(),game)-State.getPoints(terminalState.getPreseEW(),game);
     }
 }

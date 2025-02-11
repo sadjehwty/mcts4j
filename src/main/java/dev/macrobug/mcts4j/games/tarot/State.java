@@ -5,8 +5,6 @@ import io.github.nejc92.mcts.MctsDomainState;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
-import java.util.stream.Collectors;
 
 public class State implements MctsDomainState<Card, Player> {
     private final ArrayList<Card> preseNS= new ArrayList<>();
@@ -104,12 +102,12 @@ public class State implements MctsDomainState<Card, Player> {
                 }
             }
         }
-        long nrMoretti = prese.stream().filter((c) -> c.equals(Card.MORETTO)).count();
+        int nrMoretti = (int) prese.stream().filter((c) -> c.equals(Card.MORETTO)).count();
         if(nrMoretti>2 || (nrMoretti==2 && contatori>0)){
             nrSerie++;
             totSerie+=nrMoretti+contatori;
         }
-        long nrAssi = prese.stream().filter((c) -> c.value()==1 && !c.suit().equals(Suit.TRIONFI)).count();
+        int nrAssi = (int) prese.stream().filter((c) -> c.value()==1 && !c.suit().equals(Suit.TRIONFI)).count();
         if(nrAssi>2 || (nrAssi==2 && contatori>0)){
             nrSerie++;
             totSerie+=nrAssi+contatori;
@@ -197,14 +195,12 @@ public class State implements MctsDomainState<Card, Player> {
 
     private static Player[] initializePlayers(int firstPlayer) {
         Player[] players = new Player[4];
-        Random rand = new Random(System.currentTimeMillis());
         List<Card> temp = new ArrayList<>(State.allCards.size());
         temp.addAll(State.allCards);
-        temp = temp.stream().sorted((_, _)-> Double.compare(rand.nextDouble(), 0.5)).collect(Collectors.toList());
+        Collections.shuffle(temp);
         int delta = 3-firstPlayer;
         for(int i=0;i<4;i++){
-            ArrayList<Card> x = new ArrayList<>();
-            x.addAll(temp.subList(i*15,(i<3?15:17)+(i*15)));
+            ArrayList<Card> x = new ArrayList<>(temp.subList(i * 15, (i < 3 ? 15 : 17) + (i * 15)));
             players[(i+delta)%4] = new Player(x,i);
         }
         return players;

@@ -3,6 +3,7 @@ package dev.macrobug.mcts4j.games.tarot;
 import io.github.nejc92.mcts.MctsDomainState;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -12,7 +13,7 @@ public class State implements MctsDomainState<Card, Player> {
     private final ArrayList<Card> preseEW= new ArrayList<>();
     private final ArrayList<Game> games = new ArrayList<>();
     private final Player[] players;
-    public static final ArrayList<Card> allCards = initializeDeck();
+    public static final List<Card> allCards = Collections.unmodifiableList(initializeDeck());
 
     // TODO da implementare
     public static int getPoints(ArrayList<Card> prese,Game game) {

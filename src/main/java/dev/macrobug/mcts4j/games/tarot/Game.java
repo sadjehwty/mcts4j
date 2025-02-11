@@ -34,7 +34,10 @@ public class Game{
     }
 
     public Game(int firstPlayerIndex){
+        this(firstPlayerIndex,new Card[4]);
+    }
+    public Game(int firstPlayerIndex, Card[] cards){
         this.firstPlayerIndex=firstPlayerIndex;
-        this.cards=new Card[4];
+        this.cards=cards;
     }
 }

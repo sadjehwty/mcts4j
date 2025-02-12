@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertArrayEquals;
 
 public class StateTest {
     @Test
@@ -21,4 +22,13 @@ public class StateTest {
         cards.remove(Card.MATTO);
         assertEquals(978, State.getPoints(cards,game));
     }
+
+    @Test
+    public void scartataIniziale() {
+        Player player = new Player(new ArrayList<>(List.of(
+                Card.MATTO)),0);
+        assertArrayEquals(new ArrayList<Card>().toArray(), State.scartataIniziale(player).toArray());
+    }
+
+
 }

@@ -4,7 +4,9 @@ import io.github.nejc92.mcts.MctsDomainState;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class State implements MctsDomainState<Card, Player> {
     private final ArrayList<Card> preseNS= new ArrayList<>();
@@ -203,7 +205,23 @@ public class State implements MctsDomainState<Card, Player> {
             ArrayList<Card> x = new ArrayList<>(temp.subList(i * 15, (i < 3 ? 15 : 17) + (i * 15)));
             players[(i+delta)%4] = new Player(x,i);
         }
+        // azione dello scartatore
+        // per ora lo facciamo statico
+        scartataIniziale(players[firstPlayer],firstPlayer);
         return players;
+    }
+
+    private static void scartataIniziale(Player player, int firstPlayer) {
+        ArrayList<Card> carte=player.getDeck();
+        record Statistica(boolean capo, int count, Card ultima, Card penultima){}
+        List<Statistica> carteStatistica = new ArrayList<>();
+        for(Suit suit: Suit.values()){
+            int capo=suit.equals(Suit.TRIONFI)?20:14;
+            List<Card> cards = carte.stream().filter((c)->c.suit().equals(suit) && !c.equals(Card.MATTO) && !c.equals(Card.BEGATTO)).sorted().toList();
+            carteStatistica.add(new Statistica(cards.contains(new Card(capo,suit)),cards.size(), cards.get(0),cards.get(1)));
+        }
+        // TODO ciclare per trovare cosa scartare
+        // TODO usare firstPlayer per aggiungere alla lista di carte scartate
     }
 
     @Override

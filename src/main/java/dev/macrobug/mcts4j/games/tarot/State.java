@@ -2,10 +2,8 @@ package dev.macrobug.mcts4j.games.tarot;
 
 import io.github.nejc92.mcts.MctsDomainState;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import javax.swing.text.html.Option;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class State implements MctsDomainState<Card, Player> {
@@ -168,7 +166,14 @@ public class State implements MctsDomainState<Card, Player> {
 
     public static State initialize(int firstPlayer) {
         Player[] players = initializePlayers(firstPlayer);
-        return new State(new Game((firstPlayer+1)%4), players);
+        State state = new State(new Game((firstPlayer+1)%4), players);
+        // azione dello scartatore
+        // per ora lo facciamo statico
+        if (firstPlayer % 2 == 0)
+            state.preseNS.addAll(scartataIniziale(players[firstPlayer]));
+        else
+            state.preseEW.addAll(scartataIniziale(players[firstPlayer]));
+        return state;
     }
 
     private State(Game game, Player[] players) {
@@ -205,23 +210,41 @@ public class State implements MctsDomainState<Card, Player> {
             ArrayList<Card> x = new ArrayList<>(temp.subList(i * 15, (i < 3 ? 15 : 17) + (i * 15)));
             players[(i+delta)%4] = new Player(x,i);
         }
-        // azione dello scartatore
-        // per ora lo facciamo statico
-        scartataIniziale(players[firstPlayer],firstPlayer);
         return players;
     }
 
-    private static void scartataIniziale(Player player, int firstPlayer) {
+    private static List<Card> scartataIniziale(Player player) {
         ArrayList<Card> carte=player.getDeck();
-        record Statistica(boolean capo, int count, Card ultima, Card penultima){}
+        record Statistica(boolean capo, int count, Card ultima, Card penultima){
+            public int compareTo(Statistica s) {
+                boolean singolaThis = !this.capo && this.count==1;
+                boolean singolaOther = !s.capo && s.count==1;
+            }
+        }
         List<Statistica> carteStatistica = new ArrayList<>();
+        List<Card> scartate = new ArrayList<>();
         for(Suit suit: Suit.values()){
             int capo=suit.equals(Suit.TRIONFI)?20:14;
             List<Card> cards = carte.stream().filter((c)->c.suit().equals(suit) && !c.equals(Card.MATTO) && !c.equals(Card.BEGATTO)).sorted().toList();
             carteStatistica.add(new Statistica(cards.contains(new Card(capo,suit)),cards.size(), cards.get(0),cards.get(1)));
         }
+        List<Statistica> singole=carteStatistica.stream().sorted().toList();
+        Optional<Statistica> doppia = carteStatistica.stream().filter((s)->s.count==2 && !s.capo).findFirst();
+        Optional<Statistica> tripla = carteStatistica.stream().filter((s)->s.count>2 && !s.capo).findFirst();
+        if(singole.size()>1){
+            for(int i=0;i<2;i++) {
+                Card c =singole.get(i).ultima;
+                scartate.add(c);
+                player.getDeck().remove(c);
+            }
+        }else if(doppia.isPresent()){
+            scartate.add(doppia.get().ultima);
+            player.getDeck().remove(doppia.get().ultima);
+            scartate.add(doppia.get().penultima);
+            player.getDeck().remove(doppia.get().penultima);
+        }
         // TODO ciclare per trovare cosa scartare
-        // TODO usare firstPlayer per aggiungere alla lista di carte scartate
+        return scartate;
     }
 
     @Override

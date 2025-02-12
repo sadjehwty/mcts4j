@@ -213,12 +213,17 @@ public class State implements MctsDomainState<Card, Player> {
         return players;
     }
 
-    private static List<Card> scartataIniziale(Player player) {
+    public static List<Card> scartataIniziale(Player player) {
         ArrayList<Card> carte=player.getDeck();
         record Statistica(boolean capo, int count, Card ultima, Card penultima){
             public int compareTo(Statistica s) {
-                boolean singolaThis = !this.capo && this.count==1;
-                boolean singolaOther = !s.capo && s.count==1;
+                if(!this.capo && this.count==1 && !(!s.capo && s.count==1)) return -1;
+                if(!this.capo && this.count==2 && (s.capo || s.count>2)) return -1;
+                if(!this.capo && s.capo) return -1;
+                if(!s.capo && s.count==1 && !(!this.capo && this.count==1)) return 1;
+                if(!s.capo && s.count==2 && (this.capo || this.count>2)) return 1;
+                if(!s.capo && this.capo) return 1;
+                return 1-Integer.compare(this.count,s.count);
             }
         }
         List<Statistica> carteStatistica = new ArrayList<>();
@@ -229,21 +234,32 @@ public class State implements MctsDomainState<Card, Player> {
             carteStatistica.add(new Statistica(cards.contains(new Card(capo,suit)),cards.size(), cards.get(0),cards.get(1)));
         }
         List<Statistica> singole=carteStatistica.stream().sorted().toList();
-        Optional<Statistica> doppia = carteStatistica.stream().filter((s)->s.count==2 && !s.capo).findFirst();
-        Optional<Statistica> tripla = carteStatistica.stream().filter((s)->s.count>2 && !s.capo).findFirst();
-        if(singole.size()>1){
-            for(int i=0;i<2;i++) {
-                Card c =singole.get(i).ultima;
-                scartate.add(c);
-                player.getDeck().remove(c);
+        while(scartate.size()<2){
+            Statistica s = singole.removeFirst();
+            if(s.ultima!=null && 
+                    !s.ultima.equals(Card.MATTO) && 
+                    !s.ultima.equals(Card.BEGATTO) && 
+                    !s.ultima.equals(Card.MONDO) && 
+                    !s.ultima.equals(Card.ANGELO) && (
+                        s.ultima.suit().equals(Suit.TRIONFI) ||
+                        s.ultima.value()<14
+                    )){
+                scartate.add(s.ultima);
+                player.getDeck().remove(s.ultima);
             }
-        }else if(doppia.isPresent()){
-            scartate.add(doppia.get().ultima);
-            player.getDeck().remove(doppia.get().ultima);
-            scartate.add(doppia.get().penultima);
-            player.getDeck().remove(doppia.get().penultima);
+            if(scartate.size()==2) continue;
+            if(s.penultima!=null &&
+                    !s.penultima.equals(Card.MATTO) &&
+                    !s.penultima.equals(Card.BEGATTO) &&
+                    !s.penultima.equals(Card.MONDO) &&
+                    !s.penultima.equals(Card.ANGELO) && (
+                        s.penultima.suit().equals(Suit.TRIONFI) ||
+                        s.penultima.value()<14
+            )){
+                scartate.add(s.penultima);
+                player.getDeck().remove(s.penultima);
+            }
         }
-        // TODO ciclare per trovare cosa scartare
         return scartate;
     }
 

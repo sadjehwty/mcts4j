@@ -215,7 +215,8 @@ public class State implements MctsDomainState<Card, Player> {
 
     public static List<Card> scartataIniziale(Player player) {
         ArrayList<Card> carte=player.getDeck();
-        record Statistica(boolean capo, int count, Card ultima, Card penultima){
+        record Statistica(boolean capo, int count, Card ultima, Card penultima) implements Comparable<Statistica>{
+            @Override
             public int compareTo(Statistica s) {
                 if(!this.capo && this.count==1 && !(!s.capo && s.count==1)) return -1;
                 if(!this.capo && this.count==2 && (s.capo || s.count>2)) return -1;
@@ -231,9 +232,10 @@ public class State implements MctsDomainState<Card, Player> {
         for(Suit suit: Suit.values()){
             int capo=suit.equals(Suit.TRIONFI)?20:14;
             List<Card> cards = carte.stream().filter((c)->c.suit().equals(suit) && !c.equals(Card.MATTO) && !c.equals(Card.BEGATTO)).sorted().toList();
-            carteStatistica.add(new Statistica(cards.contains(new Card(capo,suit)),cards.size(), cards.get(0),cards.get(1)));
+            if(!cards.isEmpty())
+                carteStatistica.add(new Statistica(cards.contains(new Card(capo,suit)),cards.size(), cards.get(0),cards.size()>1?cards.get(1):null));
         }
-        List<Statistica> singole=carteStatistica.stream().sorted().toList();
+        ArrayList<Statistica> singole=new ArrayList<>(carteStatistica.stream().sorted().toList());
         while(scartate.size()<2){
             Statistica s = singole.removeFirst();
             if(s.ultima!=null && 

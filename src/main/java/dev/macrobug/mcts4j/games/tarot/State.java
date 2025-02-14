@@ -42,7 +42,7 @@ public class State implements MctsDomainState<Card, Player> {
                         if(prese.contains(new Card(i,suit)))
                             nr++;
                     if(nr>1) done=true;
-                    else if(tmpContatori>0){
+                    else if(tmpContatori>0 && nr>0){
                         done=true;
                         tmpContatori--;
                     }
@@ -70,7 +70,7 @@ public class State implements MctsDomainState<Card, Player> {
                             if(nrMoretti>0){
                                 if(nrMoretti==4){
                                     totSerie+= (int) nrMoretti;
-                                    totSerie+=tmpContatori;
+                                    totSerie+=contatori;
                                 } else if(tmpContatori>0){
                                     totScavezzo++;
                                 }
@@ -81,20 +81,18 @@ public class State implements MctsDomainState<Card, Player> {
             }else{
                 if(prese.contains(new Card(14,suit))){
                     int nr=0;
-                    int tmpContatori=contatori;
                     boolean done=false;
                     for(int i=11;i<14;i++)
                         if(prese.contains(new Card(i,suit)))
                             nr++;
-                    if(nr>1) done=true;
-                    else if(tmpContatori>0){
+                    if(nr>2) done=true;
+                    else if(contatori>0 && nr>1){
                         done=true;
-                        tmpContatori--;
                     }
                     if(done){
                         nrSerie++;
                         totSerie+=nr;
-                        totSerie+=tmpContatori;
+                        totSerie+=contatori;
                         if(prese.contains(new Card(1,suit)))
                             totSerie++;
                     }
@@ -104,12 +102,12 @@ public class State implements MctsDomainState<Card, Player> {
         int nrMoretti = (int) prese.stream().filter((c) -> c.equals(Card.MORETTO)).count();
         if(nrMoretti>2 || (nrMoretti==2 && contatori>0)){
             nrSerie++;
-            totSerie+=nrMoretti+contatori;
+            totSerie+=nrMoretti+contatori-1;
         }
         int nrAssi = (int) prese.stream().filter((c) -> c.value()==1 && !c.suit().equals(Suit.TRIONFI)).count();
         if(nrAssi>2 || (nrAssi==2 && contatori>0)){
             nrSerie++;
-            totSerie+=nrAssi+contatori;
+            totSerie+=nrAssi+contatori-1;
         }
 
         // SCAVEZZO
@@ -134,7 +132,7 @@ public class State implements MctsDomainState<Card, Player> {
                     case 13->14;
                     case 14->17;
                     default -> throw new IllegalStateException("Unexpected value: " + i);
-                }*(nr>3?2:1);
+                }*(nr>=3?2:1);
             }
         }
         // CARTACCE
@@ -152,7 +150,7 @@ public class State implements MctsDomainState<Card, Player> {
         nrUno = prese.contains(Card.MATTO) ? Math.floorDiv(nrUno, 2) : Math.ceilDiv(nrUno, 2);
         // ULTIMA PRESA
         // SE L'ULTMA PRESA È DI MORETTI NON FUNZIONA
-        ArrayList<Card> last = new ArrayList<>(List.of(game.getCards()));
+        ArrayList<Card> last = game.getCards()[0]!=null ? new ArrayList<>(List.of(game.getCards())) : new ArrayList<>();
         ArrayList<Card> pulite = new ArrayList<>(last.stream().filter((c)->!c.equals(Card.MATTO) && !c.equals(Card.MORETTO)).toList());
         int ultimaPresa = 0;
         if(!pulite.isEmpty()){

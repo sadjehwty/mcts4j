@@ -13,7 +13,6 @@ public class State implements MctsDomainState<Card, Player> {
     private final Player[] players;
     public static final List<Card> allCards = Collections.unmodifiableList(initializeDeck());
 
-    // TODO da implementare
     public static int getPoints(ArrayList<Card> prese,Game game) {
         // CAPPOTTO
         if(prese.size()==1) prese.remove(Card.MATTO);
@@ -152,9 +151,22 @@ public class State implements MctsDomainState<Card, Player> {
         nrUno-=nrDue-nrTre-nrQuattro-nrCinque;
         nrUno = prese.contains(Card.MATTO) ? Math.floorDiv(nrUno, 2) : Math.ceilDiv(nrUno, 2);
         // ULTIMA PRESA
-        Card last=game.getCards()[3];
-        if(last!=null && last.equals(Card.MATTO)) last=game.getCards()[2];
-        int ultimaPresa = last!=null && prese.contains(last) ? 6 : 0;
+        // SE L'ULTMA PRESA È DI MORETTI NON FUNZIONA
+        ArrayList<Card> last = new ArrayList<>(List.of(game.getCards()));
+        ArrayList<Card> pulite = new ArrayList<>(last.stream().filter((c)->!c.equals(Card.MATTO) && !c.equals(Card.MORETTO)).toList());
+        int ultimaPresa = 0;
+        if(!pulite.isEmpty()){
+            if(prese.contains(pulite.getFirst()))
+                ultimaPresa=6;
+            /* NON SO COME GESTIRE I MORETTI
+        } else if(last.stream().filter((c)->c.equals(Card.MORETTO)).count()==){
+             */
+
+        }else{
+            Card l = game.getCards()[3];
+            if(l!=null && prese.contains(l))
+                ultimaPresa=6;
+        }
         return totSerie*(nrSerie>2?10:5)+totScavezzo*(nrScavezzo>2?2:1)+ultimaPresa+(nrDue*2)+(nrTre*3)+(nrQuattro*4)+(nrCinque*5)+nrUno;
     }
 

@@ -16,11 +16,41 @@ public class StateTest {
         assertEquals(0, State.getPoints(new ArrayList<>(),new Game(0)));
         // CAPPOTTO
         assertEquals(0, State.getPoints(new ArrayList<>(List.of(Card.MATTO)),new Game(0)));
-        ArrayList<Card> cards = new ArrayList<>(State.allCards);
+        ArrayList<Card> interoMazzo = new ArrayList<>(State.allCards);
         Game game=new Game(0,new Card[]{Card.MORETTO,Card.MORETTO,Card.MORETTO,Card.MORETTO});
-        assertEquals(978, State.getPoints(cards,game));
-        cards.remove(Card.MATTO);
-        assertEquals(978, State.getPoints(cards,game));
+        assertEquals(978, State.getPoints(interoMazzo,game));
+        interoMazzo.remove(Card.MATTO);
+        assertEquals(978, State.getPoints(interoMazzo,game));
+        // mano normale
+        game=new Game(0,new Card[]{new Card(1,Suit.DENARI),Card.MORETTO,Card.MORETTO,Card.MORETTO});
+        interoMazzo = new ArrayList<>(State.allCards);
+        ArrayList<Card> mano = new ArrayList<>(List.of(
+                new Card(18,Suit.TRIONFI),
+                new Card(15,Suit.TRIONFI),
+                new Card(7,Suit.TRIONFI),
+                new Card(4,Suit.TRIONFI),
+                new Card(0,Suit.TRIONFI),
+                new Card(1,Suit.SPADE),
+                new Card(14,Suit.SPADE),
+                new Card(12,Suit.SPADE),
+                new Card(10,Suit.SPADE),
+                new Card(9,Suit.SPADE),
+                new Card(6,Suit.SPADE),
+                new Card(1,Suit.BASTONI),
+                new Card(14,Suit.BASTONI),
+                new Card(10,Suit.BASTONI),
+                new Card(9,Suit.BASTONI),
+                new Card(6,Suit.BASTONI),
+                new Card(11,Suit.COPPE),
+                new Card(10,Suit.COPPE),
+                new Card(8,Suit.COPPE),
+                new Card(10,Suit.DENARI),
+                new Card(9,Suit.DENARI)
+                ));
+        assertEquals(40,State.getPoints(mano,game));
+        ArrayList<Card> mano2 = new ArrayList<>(interoMazzo);
+        mano2.removeAll(mano);
+        assertEquals(459,State.getPoints(mano2,game));
     }
 
     @Test

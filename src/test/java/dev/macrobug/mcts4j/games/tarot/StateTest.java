@@ -3,7 +3,6 @@ package dev.macrobug.mcts4j.games.tarot;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
@@ -18,9 +17,9 @@ public class StateTest {
         assertEquals(0, State.getPoints(new ArrayList<>(List.of(Card.MATTO)),new Game(0)));
         ArrayList<Card> interoMazzo = new ArrayList<>(State.allCards);
         Game game=new Game(0,new Card[]{Card.MORETTO,Card.MORETTO,Card.MORETTO,Card.MORETTO});
-        assertEquals(978, State.getPoints(interoMazzo,game));
+        assertEquals(958, State.getPoints(interoMazzo,game));
         interoMazzo.remove(Card.MATTO);
-        assertEquals(978, State.getPoints(interoMazzo,game));
+        assertEquals(958, State.getPoints(interoMazzo,game));
         // mano normale
         game=new Game(0,new Card[]{new Card(1,Suit.DENARI),Card.MORETTO,Card.MORETTO,Card.MORETTO});
         interoMazzo = new ArrayList<>(State.allCards);

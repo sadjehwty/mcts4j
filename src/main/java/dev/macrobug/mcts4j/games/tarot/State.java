@@ -17,8 +17,8 @@ public class State implements MctsDomainState<Card, Player> {
         if(prese.size()==61) prese.add(Card.MATTO);
         int trionfi=0;
         int contatori=0;
-        int nrSerie=0;
-        int totSerie=0;
+        int nrSequenze=0;
+        int totSequenze=0;
         int nrCriccone=0;
         int totCriccone=0;
         if(prese.contains(Card.MATTO)){
@@ -29,7 +29,7 @@ public class State implements MctsDomainState<Card, Player> {
             trionfi++;
             contatori++;
         }
-        // SERIE
+        // SEQUENZE
         for(Suit suit:Suit.values()){
             if(suit.equals(Suit.TRIONFI)){
                 if(prese.contains(Card.ANGELO)){
@@ -39,22 +39,22 @@ public class State implements MctsDomainState<Card, Player> {
                     for(int i=17;i<20;i++)
                         if(prese.contains(new Card(i,suit)))
                             nr++;
-                    if(nr>1) done=true;
-                    else if(tmpContatori>0 && nr>0){
+                    if(nr>2) done=true;
+                    else if(tmpContatori>0 && nr>1){
                         done=true;
                         tmpContatori--;
                     }
                     if(done){
-                        nrSerie++;
-                        totSerie+=nr;
+                        nrSequenze++;
+                        totSequenze+=nr;
                         boolean skip=false;
                         boolean end=false;
                         for(int i=16;i>=5;i--){
                             if(prese.contains(new Card(i,suit))) {
-                                totSerie++;
+                                totSequenze++;
                                 skip=false;
                             }else if(tmpContatori>0 && !skip){
-                                totSerie++;
+                                totSequenze++;
                                 skip=true;
                                 tmpContatori--;
                             }else {
@@ -67,8 +67,8 @@ public class State implements MctsDomainState<Card, Player> {
                             long nrMoretti = prese.stream().filter((c) -> c.value()==4 && c.suit().equals(Suit.TRIONFI)).count();
                             if(nrMoretti>0){
                                 if(nrMoretti==4){
-                                    totSerie+= (int) nrMoretti;
-                                    totSerie+=contatori;
+                                    totSequenze+= (int) nrMoretti;
+                                    totSequenze+=contatori;
                                 } else if(tmpContatori>0){
                                     totCriccone++;
                                 }
@@ -88,24 +88,24 @@ public class State implements MctsDomainState<Card, Player> {
                         done=true;
                     }
                     if(done){
-                        nrSerie++;
-                        totSerie+=nr;
-                        totSerie+=contatori;
+                        nrSequenze++;
+                        totSequenze+=nr;
+                        totSequenze+=contatori;
                         if(prese.contains(new Card(1,suit)))
-                            totSerie++;
+                            totSequenze++;
                     }
                 }
             }
         }
         int nrMoretti = (int) prese.stream().filter((c) -> c.value()==4 && c.suit().equals(Suit.TRIONFI)).count();
         if(nrMoretti>2 || (nrMoretti==2 && contatori>0)){
-            nrSerie++;
-            totSerie+=nrMoretti+contatori-1;
+            nrSequenze++;
+            totSequenze+=nrMoretti+contatori-1;
         }
         int nrAssi = (int) prese.stream().filter((c) -> c.value()==1 && !c.suit().equals(Suit.TRIONFI)).count();
         if(nrAssi>2 || (nrAssi==2 && contatori>0)){
-            nrSerie++;
-            totSerie+=nrAssi+contatori-1;
+            nrSequenze++;
+            totSequenze+=nrAssi+contatori-1;
         }
 
         // CRICCONE
@@ -143,8 +143,8 @@ public class State implements MctsDomainState<Card, Player> {
                 !c.equals(Card.MATTO) &&
                 !c.equals(Card.MONDO) &&
                 !c.equals(Card.ANGELO) &&
-                (!c.suit().equals(Suit.TRIONFI) || c.value()<10)).count();
-        nrUno-=nrDue-nrTre-nrQuattro-nrCinque;
+                (c.suit().equals(Suit.TRIONFI) || c.value()<=10)).count();
+        nrUno-=(nrDue+nrTre+nrQuattro+nrCinque);
         nrUno = prese.contains(Card.MATTO) ? Math.floorDiv(nrUno, 2) : Math.ceilDiv(nrUno, 2);
         // ULTIMA PRESA
         // SE L'ULTMA PRESA È DI MORETTI NON FUNZIONA
@@ -159,7 +159,7 @@ public class State implements MctsDomainState<Card, Player> {
             if(l!=null && prese.contains(l))
                 ultimaPresa=6;
         }
-        return totSerie*(nrSerie>2?10:5)+totCriccone*(nrCriccone>2?2:1)+ultimaPresa+(nrDue*2)+(nrTre*3)+(nrQuattro*4)+(nrCinque*5)+nrUno;
+        return totSequenze*(nrSequenze>2?10:5)+totCriccone*(nrCriccone>2?2:1)+ultimaPresa+(nrDue*2)+(nrTre*3)+(nrQuattro*4)+(nrCinque*5)+nrUno;
     }
 
     public Game getCurrentGame(){

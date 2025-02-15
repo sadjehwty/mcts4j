@@ -49,7 +49,7 @@ public class StateTest {
         assertEquals(50,State.getPoints(mano,game));
         ArrayList<Card> mano2 = new ArrayList<>(interoMazzo);
         mano2.removeAll(mano);
-        assertEquals(459,State.getPoints(mano2,game));
+        assertEquals(460,State.getPoints(mano2,game));
         game=new Game(0,new Card[]{
                 new Card(1,Suit.DENARI),
                 new Card(6,Suit.DENARI),

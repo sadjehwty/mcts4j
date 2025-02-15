@@ -16,18 +16,18 @@ public class StateTest {
         // CAPPOTTO
         assertEquals(0, State.getPoints(new ArrayList<>(List.of(Card.MATTO)),new Game(0)));
         ArrayList<Card> interoMazzo = new ArrayList<>(State.allCards);
-        Game game=new Game(0,new Card[]{Card.MORETTO,Card.MORETTO,Card.MORETTO,Card.MORETTO});
-        assertEquals(958, State.getPoints(interoMazzo,game));
+        Game game=new Game(0,new Card[]{new Card(4,Suit.TRIONFI,0),new Card(4,Suit.TRIONFI,1),new Card(4,Suit.TRIONFI,2),new Card(4,Suit.TRIONFI,3)});
+        assertEquals(939, State.getPoints(interoMazzo,game));
         interoMazzo.remove(Card.MATTO);
-        assertEquals(958, State.getPoints(interoMazzo,game));
+        assertEquals(939, State.getPoints(interoMazzo,game));
         // mano normale
-        game=new Game(0,new Card[]{new Card(1,Suit.DENARI),Card.MORETTO,Card.MORETTO,Card.MORETTO});
+        game=new Game(0,new Card[]{new Card(1,Suit.DENARI),new Card(4,Suit.TRIONFI,0),new Card(4,Suit.TRIONFI,1),new Card(4,Suit.TRIONFI,2)});
         interoMazzo = new ArrayList<>(State.allCards);
         ArrayList<Card> mano = new ArrayList<>(List.of(
                 new Card(18,Suit.TRIONFI),
                 new Card(15,Suit.TRIONFI),
                 new Card(7,Suit.TRIONFI),
-                new Card(4,Suit.TRIONFI),
+                new Card(4,Suit.TRIONFI,0),
                 new Card(0,Suit.TRIONFI),
                 new Card(1,Suit.SPADE),
                 new Card(14,Suit.SPADE),
@@ -49,9 +49,22 @@ public class StateTest {
         assertEquals(40,State.getPoints(mano,game));
         ArrayList<Card> mano2 = new ArrayList<>(interoMazzo);
         mano2.removeAll(mano);
-        for(int i=0;i<3;i++)
-            mano2.add(Card.MORETTO);
         assertEquals(459,State.getPoints(mano2,game));
+        game=new Game(0,new Card[]{
+                new Card(1,Suit.DENARI),
+                new Card(6,Suit.DENARI),
+                new Card(7,Suit.DENARI),
+                new Card(8,Suit.DENARI)
+        });
+        mano = new ArrayList<>(List.of(
+                new Card(4,Suit.TRIONFI,0),
+                new Card(4,Suit.TRIONFI,1),
+                new Card(4,Suit.TRIONFI,2),
+                new Card(4,Suit.TRIONFI,3),
+                Card.BEGATTO,
+                Card.MATTO
+        ));
+        assertEquals(36,State.getPoints(mano,game));
     }
 
     @Test

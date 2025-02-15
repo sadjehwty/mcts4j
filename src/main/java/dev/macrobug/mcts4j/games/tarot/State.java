@@ -66,7 +66,7 @@ public class State implements MctsDomainState<Card, Player> {
                         }
                         if(!end) {
                             // i moretti fanno caso a sé
-                            long nrMoretti = prese.stream().filter((c) -> c.equals(Card.MORETTO)).count();
+                            long nrMoretti = prese.stream().filter((c) -> c.value()==4 && c.suit().equals(Suit.TRIONFI)).count();
                             if(nrMoretti>0){
                                 if(nrMoretti==4){
                                     totSerie+= (int) nrMoretti;
@@ -99,7 +99,7 @@ public class State implements MctsDomainState<Card, Player> {
                 }
             }
         }
-        int nrMoretti = (int) prese.stream().filter((c) -> c.equals(Card.MORETTO)).count();
+        int nrMoretti = (int) prese.stream().filter((c) -> c.value()==4 && c.suit().equals(Suit.TRIONFI)).count();
         if(nrMoretti>2 || (nrMoretti==2 && contatori>0)){
             nrSerie++;
             totSerie+=nrMoretti+contatori-1;
@@ -151,15 +151,11 @@ public class State implements MctsDomainState<Card, Player> {
         // ULTIMA PRESA
         // SE L'ULTMA PRESA È DI MORETTI NON FUNZIONA
         ArrayList<Card> last = game.getCards()[0]!=null ? new ArrayList<>(List.of(game.getCards())) : new ArrayList<>();
-        ArrayList<Card> pulite = new ArrayList<>(last.stream().filter((c)->!c.equals(Card.MATTO) && !c.equals(Card.MORETTO)).toList());
+        ArrayList<Card> pulite = new ArrayList<>(last.stream().filter((c)->!c.equals(Card.MATTO)).toList());
         int ultimaPresa = 0;
         if(!pulite.isEmpty()){
             if(prese.contains(pulite.getFirst()))
                 ultimaPresa=6;
-            /* NON SO COME GESTIRE I MORETTI
-        } else if(last.stream().filter((c)->c.equals(Card.MORETTO)).count()==){
-             */
-
         }else{
             Card l = game.getCards()[3];
             if(l!=null && prese.contains(l))
@@ -198,7 +194,7 @@ public class State implements MctsDomainState<Card, Player> {
                 deck.add(new Card(0,suit));
                 deck.add(new Card(1,suit));
                 for(int i=0;i<4;i++)
-                    deck.add(new Card(4,suit));
+                    deck.add(new Card(4,suit,i));
                 for(int i=5;i<21;i++)
                     deck.add(new Card(i,suit));
             }else{

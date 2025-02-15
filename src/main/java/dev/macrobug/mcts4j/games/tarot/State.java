@@ -121,7 +121,7 @@ public class State implements MctsDomainState<Card, Player> {
         }
         for(int i=11;i<=14;i++){
             final int f=i;
-            long nr = prese.stream().filter((c) -> c.value()==f).count();
+            long nr = prese.stream().filter((c) -> c.value()==f && !c.suit().equals(Suit.TRIONFI)).count();
             if(nr>2){
                 nrCriccone++;
                 totCriccone+=switch (i){

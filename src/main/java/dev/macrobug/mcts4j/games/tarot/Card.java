@@ -3,13 +3,13 @@ package dev.macrobug.mcts4j.games.tarot;
 public class Card implements Comparable<Card>{
     public final static Card MATTO=new Card(0,Suit.TRIONFI);
     public final static Card BEGATTO=new Card(1,Suit.TRIONFI);
-    public final static Card MORETTO=new Card(4,Suit.TRIONFI);
     public final static Card MONDO=new Card(19,Suit.TRIONFI);
     public final static Card ANGELO=new Card(20,Suit.TRIONFI);
 
 
     private final int value;
     private final Suit suit;
+    private final int copy;
 
     public static Card parse(String s) {
         return new Card(Integer.parseInt(s.substring(0,2)),Suit.parse(s.substring(2)));
@@ -18,12 +18,16 @@ public class Card implements Comparable<Card>{
     public Suit suit(){return suit;}
     public int value(){return value;}
 
-    public Card(int value, Suit suit){
+    public Card(int value,Suit suit, int copy){
+        this.copy=copy;
         this.value=value;
         this.suit=suit;
     }
+    public Card(int value, Suit suit){
+        this(value,suit,0);
+    }
     public boolean equals(Object o){
-        return o instanceof Card c && c.suit.equals(suit) && c.value == value;
+        return o instanceof Card c && c.suit.equals(suit) && c.value == value && c.copy==copy;
     }
     @Override
     public int compareTo(Card card) {

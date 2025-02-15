@@ -2,9 +2,7 @@ package dev.macrobug.mcts4j.games.tarot;
 
 import io.github.nejc92.mcts.MctsDomainState;
 
-import javax.swing.text.html.Option;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class State implements MctsDomainState<Card, Player> {
     private final ArrayList<Card> preseNS= new ArrayList<>();
@@ -21,8 +19,8 @@ public class State implements MctsDomainState<Card, Player> {
         int contatori=0;
         int nrSerie=0;
         int totSerie=0;
-        int nrScavezzo=0;
-        int totScavezzo=0;
+        int nrCriccone=0;
+        int totCriccone=0;
         if(prese.contains(Card.MATTO)){
             trionfi++;
             contatori++;
@@ -72,7 +70,7 @@ public class State implements MctsDomainState<Card, Player> {
                                     totSerie+= (int) nrMoretti;
                                     totSerie+=contatori;
                                 } else if(tmpContatori>0){
-                                    totScavezzo++;
+                                    totCriccone++;
                                 }
                             }
                         }
@@ -110,7 +108,7 @@ public class State implements MctsDomainState<Card, Player> {
             totSerie+=nrAssi+contatori-1;
         }
 
-        // SCAVEZZO
+        // CRICCONE
         if(prese.contains(Card.ANGELO)){
             trionfi++;
         }
@@ -118,21 +116,21 @@ public class State implements MctsDomainState<Card, Player> {
             trionfi++;
         }
         if(trionfi>2){
-            nrScavezzo++;
-            totScavezzo+=18*(trionfi>3?2:1);
+            nrCriccone++;
+            totCriccone+=18*(trionfi>3?2:1);
         }
         for(int i=11;i<=14;i++){
             final int f=i;
             long nr = prese.stream().filter((c) -> c.value()==f).count();
             if(nr>2){
-                nrScavezzo++;
-                totScavezzo+=switch (i){
+                nrCriccone++;
+                totCriccone+=switch (i){
                     case 11->12;
                     case 12->13;
                     case 13->14;
                     case 14->17;
                     default -> throw new IllegalStateException("Unexpected value: " + i);
-                }*(nr>=3?2:1);
+                }*(nr>3?2:1);
             }
         }
         // CARTACCE
@@ -161,7 +159,7 @@ public class State implements MctsDomainState<Card, Player> {
             if(l!=null && prese.contains(l))
                 ultimaPresa=6;
         }
-        return totSerie*(nrSerie>2?10:5)+totScavezzo*(nrScavezzo>2?2:1)+ultimaPresa+(nrDue*2)+(nrTre*3)+(nrQuattro*4)+(nrCinque*5)+nrUno;
+        return totSerie*(nrSerie>2?10:5)+totCriccone*(nrCriccone>2?2:1)+ultimaPresa+(nrDue*2)+(nrTre*3)+(nrQuattro*4)+(nrCinque*5)+nrUno;
     }
 
     public Game getCurrentGame(){

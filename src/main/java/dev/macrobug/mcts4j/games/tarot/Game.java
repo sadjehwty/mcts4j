@@ -40,4 +40,12 @@ public class Game{
         this.firstPlayerIndex=firstPlayerIndex;
         this.cards=cards;
     }
+
+    public void nullifyCurrent() {
+        for(int i=cards.length-1;i>=0;i--)
+            if(cards[i]!=null){
+                cards[i]=null;
+                break;
+            }
+    }
 }

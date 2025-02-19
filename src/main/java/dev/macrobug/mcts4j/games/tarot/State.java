@@ -431,7 +431,7 @@ public class State implements MctsDomainState<Card, Player> {
         Player currentPlayer = getCurrentAgent();
         currentPlayer.getDeck().add(card);
         currentPlayer.getGone().remove(card);
-        current.setCurrent(null);
+        current.nullifyCurrent();
     }
 
     @Override

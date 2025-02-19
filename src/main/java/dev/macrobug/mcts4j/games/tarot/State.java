@@ -209,7 +209,7 @@ public class State implements MctsDomainState<Card, Player> {
         List<Card> temp = new ArrayList<>(State.allCards.size());
         temp.addAll(State.allCards);
         Collections.shuffle(temp);
-        int delta = 3-firstPlayer;
+        int delta=1+firstPlayer;
         for(int i=0;i<4;i++){
             ArrayList<Card> x = new ArrayList<>(temp.subList(i * 15, (i < 3 ? 15 : 17) + (i * 15)));
             players[(i+delta)%4] = new Player(x,i);

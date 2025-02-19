@@ -39,8 +39,8 @@ public class State implements MctsDomainState<Card, Player> {
                     for(int i=17;i<20;i++)
                         if(prese.contains(new Card(i,suit)))
                             nr++;
-                    if(nr>2) done=true;
-                    else if(tmpContatori>0 && nr>1){
+                    if(nr>1) done=true;
+                    else if(tmpContatori>0 && nr>0){
                         done=true;
                         tmpContatori--;
                     }
@@ -83,8 +83,8 @@ public class State implements MctsDomainState<Card, Player> {
                     for(int i=11;i<14;i++)
                         if(prese.contains(new Card(i,suit)))
                             nr++;
-                    if(nr>2) done=true;
-                    else if(contatori>0 && nr>1){
+                    if(nr>1) done=true;
+                    else if(contatori>0 && nr>0){
                         done=true;
                     }
                     if(done){
@@ -121,7 +121,7 @@ public class State implements MctsDomainState<Card, Player> {
         }
         for(int i=11;i<=14;i++){
             final int f=i;
-            long nr = prese.stream().filter((c) -> c.value()==f).count();
+            long nr = prese.stream().filter((c) -> c.value()==f && !c.suit().equals(Suit.TRIONFI)).count();
             if(nr>2){
                 nrCriccone++;
                 totCriccone+=switch (i){

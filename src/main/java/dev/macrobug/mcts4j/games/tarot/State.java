@@ -382,7 +382,7 @@ public class State implements MctsDomainState<Card, Player> {
             preseNS.addAll(indici.presa);
         else
             preseEW.addAll(indici.presa);
-        return preseEW.size() + preseNS.size() ==62 ? current : new Game((indici.matto + current.getFirstPlayerIndex()) % 4);
+        return preseEW.size() + preseNS.size() ==62 ? current : new Game((indici.delta + current.getFirstPlayerIndex()) % 4);
     }
     private void destroyGame(Game current){
         Indici indici=getIndici(current);
@@ -428,7 +428,7 @@ public class State implements MctsDomainState<Card, Player> {
         if(current.isDone()){
             destroyGame(current);
         }
-        Player currentPlayer = getCurrentAgent();
+        Player currentPlayer = getPreviousAgent();
         currentPlayer.getDeck().add(card);
         currentPlayer.getGone().remove(card);
         current.nullifyCurrent();

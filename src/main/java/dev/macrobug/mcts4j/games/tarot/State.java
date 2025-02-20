@@ -288,7 +288,9 @@ public class State implements MctsDomainState<Card, Player> {
         Game current = games.getLast();
         if(!current.isStarted()) {
             current = games.get(games.size() - 2);
-            return players[(current.getFirstPlayerIndex()+3)%4];
+            return players[(current.getFirstPlayerIndex() + 3) % 4];
+        }else if(current.isDone()){
+            return getCurrentAgent();
         }else {
             int currentIndex=getCurrentIndex();
             if(currentIndex==0) currentIndex=4;

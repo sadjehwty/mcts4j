@@ -162,6 +162,9 @@ public class State implements MctsDomainState<Card, Player> {
         return totSequenze*(nrSequenze>2?10:5)+totCriccone*(nrCriccone>2?2:1)+ultimaPresa+(nrDue*2)+(nrTre*3)+(nrQuattro*4)+(nrCinque*5)+nrUno;
     }
 
+    public Game getPreviousGame(){
+        return games.size()>1?games.get(games.size()-2):null;
+    }
     public Game getCurrentGame(){
         return games.getLast();
     }

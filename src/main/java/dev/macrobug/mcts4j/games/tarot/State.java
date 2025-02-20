@@ -287,6 +287,7 @@ public class State implements MctsDomainState<Card, Player> {
     public Player getPreviousAgent() {
         Game current = games.getLast();
         if(!current.isStarted()) {
+            if(games.size()==1) return getCurrentAgent();
             current = games.get(games.size() - 2);
             return players[(current.getFirstPlayerIndex() + 3) % 4];
         }else if(current.isDone()){
@@ -308,7 +309,7 @@ public class State implements MctsDomainState<Card, Player> {
     public List<Card> getAvailableActionsForCurrentAgent() {
         Game currentGame = games.getLast();
         Player currentPlayer = getCurrentAgent();
-        List<Card> availableActions = currentPlayer.getDeck();
+        List<Card> availableActions = new ArrayList<>(currentPlayer.getDeck());
         if(currentGame.getFirstPlayerIndex()!=getCurrentIndex()){
             if(availableActions.stream().anyMatch((c)->c.suit().equals(currentGame.semeDiMano())))
                 availableActions=availableActions.stream().filter((c)->c.suit().equals(currentGame.semeDiMano())).toList();

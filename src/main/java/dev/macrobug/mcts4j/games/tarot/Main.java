@@ -2,7 +2,7 @@ package dev.macrobug.mcts4j.games.tarot;
 
 import io.github.nejc92.mcts.Mcts;
 
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
@@ -14,28 +14,33 @@ public class Main {
             /*if(turn%2==1) action = Card.parse(sc.nextLine());
             else*/ action = mcts.uctSearchWithExploration(state,1.5);
             state.performActionForCurrentAgent(action);
-            Card[] cards=state.getCurrentGame().getCards();
+            Game game=state.getCurrentGame();
             if(!state.getCurrentGame().isStarted() && state.getPreviousGame()!=null) {
-                Main.printTable(state.getPreviousGame().getCards());
+                Main.printTable(state.getPreviousGame());
+                System.out.println("-------------------");
             }
-            Main.printTable(cards);
+            Main.printTable(game);
             if(!state.isTerminal()){System.out.println("-------------------");}
         }
     }
 
-    private static void printTable(Card[] cards) {
-        for(int i=3;i>=0;i--){
-            Card card=cards[i];
+    private static void printTable(Game game) {
+        Card[] cards = game.getCards();
+        int[] ids=new int[]{2,1,3,0};
+        for(int i:ids){
+            int j = 4-i-game.getFirstPlayerIndex();
+            if(j<0) j+=4;
+            if(j>3) j-=4;
+            Card card=cards[j];
             StringBuffer stringBuffer=new StringBuffer("         ");
             int start=switch (i){
                 case 1->0;
-                case 2->6;
+                case 3->6;
                 default->3;
             };
             if(card!=null)
                 stringBuffer.replace(start,start+3, card.toString());
             System.out.println(stringBuffer);
-            System.out.println();
         }
     }
 }

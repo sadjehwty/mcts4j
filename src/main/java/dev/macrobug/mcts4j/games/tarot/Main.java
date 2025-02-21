@@ -7,23 +7,36 @@ import java.util.*;
 public class Main {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        State state = State.initialize(0);
         Mcts<State, Card, Player> mcts = Mcts.initializeIterations(15000);
-        for(int turn=0;!state.isTerminal();turn++) {
-            Card action;
+        int ns=0,ew=0;
+        for(int i=0;i<4;i++) {
+            State state = State.initialize(i);
+            for (int turn = 0; !state.isTerminal(); turn++) {
+                Card action;
             /*if(turn%2==1) action = Card.parse(sc.nextLine());
-            else*/ action = mcts.uctSearchWithExploration(state,1.5);
-            state.performActionForCurrentAgent(action);
-            Game game=state.getCurrentGame();
-            if(!state.getCurrentGame().isStarted() && state.getPreviousGame()!=null) {
-                Main.printTable(state.getPreviousGame());
-                System.out.println("-------------------");
+            else*/
+                action = mcts.uctSearchWithExploration(state, 1.5);
+                state.performActionForCurrentAgent(action);
+                Game game = state.getCurrentGame();
+                if (!state.getCurrentGame().isStarted() && state.getPreviousGame() != null) {
+                    Main.printTable(state.getPreviousGame());
+                    System.out.println("-------------------");
+                }
+                Main.printTable(game);
+                if (!state.isTerminal()) {
+                    System.out.println("-------------------");
+                }
             }
-            Main.printTable(game);
-            if(!state.isTerminal()){System.out.println("-------------------");}
+            int t = State.getPoints(state.getPreseNS(), state.getCurrentGame());
+            ns+=t;
+            System.out.println("NS: " + t);
+            t=State.getPoints(state.getPreseEW(), state.getCurrentGame());
+            ew+=t;
+            System.out.println("EW: " + t);
         }
-        System.out.println("NS: "+State.getPoints(state.getPreseNS(),state.getCurrentGame()));
-        System.out.println("EW: "+State.getPoints(state.getPreseEW(),state.getCurrentGame()));
+        System.out.println("===================");
+        System.out.println("NS: " + ns);
+        System.out.println("EW: " + ew);
     }
 
     private static void printTable(Game game) {

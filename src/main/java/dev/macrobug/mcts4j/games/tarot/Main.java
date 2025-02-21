@@ -22,6 +22,8 @@ public class Main {
             Main.printTable(game);
             if(!state.isTerminal()){System.out.println("-------------------");}
         }
+        System.out.println("NS: "+State.getPoints(state.getPreseNS(),state.getCurrentGame()));
+        System.out.println("EW: "+State.getPoints(state.getPreseEW(),state.getCurrentGame()));
     }
 
     private static void printTable(Game game) {

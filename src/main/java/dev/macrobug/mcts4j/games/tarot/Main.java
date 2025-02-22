@@ -13,12 +13,21 @@ public class Main {
             State state = State.initialize(i);
             for (int turn = 0; !state.isTerminal(); turn++) {
                 Card action;
-                /*if((state.getCurrentGame().getFirstPlayerIndex()+turn)%411==0){
+                if((state.getCurrentGame().getFirstPlayerIndex()+turn)%411==0){
                     ArrayList<Card> t = new ArrayList<>(state.getCurrentAgent().getDeck());
                     t.sort((c1,c2)->c1.suit().compareTo(c2.suit())!=0 ? c1.suit().compareTo(c2.suit()) : Integer.compare(c1.value(),c2.value()));
-                    System.out.println(t);
-                    action = Card.parse(sc.nextLine());
-                } else*/
+                    boolean good=true;
+                    int choise=-1;
+                    do{
+                        for(int j=0;j<t.size();j++)
+                            System.out.print(String.format("%1$4d",j));
+                        System.out.println();
+                        System.out.println(t);
+                        choise = Integer.parseInt(sc.nextLine());
+                        good = choise < t.size() && choise>-1;
+                    }while(!good);
+                    action = t.get(choise);
+                } else
                     action = mcts.uctSearchWithExploration(state, 1.5);
                 state.performActionForCurrentAgent(action);
                 Game game = state.getCurrentGame();

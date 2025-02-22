@@ -11,11 +11,6 @@ public class Card implements Comparable<Card>{
     private final Suit suit;
     private final int copy;
 
-    public static Card parse(String s) {
-        while(s.length()<3) s="0"+s;
-        return new Card(Integer.parseInt(s.substring(0,2)),Suit.parse(s.substring(2)));
-    }
-
     public Suit suit(){return suit;}
     public int value(){return value;}
 

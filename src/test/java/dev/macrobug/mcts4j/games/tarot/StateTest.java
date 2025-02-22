@@ -90,7 +90,7 @@ public class StateTest {
         assertArrayEquals(new ArrayList<>(List.of(
                 new Card(8,Suit.SPADE),
                 new Card(13,Suit.DENARI)
-        )).toArray(), State.scartataIniziale(player).toArray());
+        )).toArray(), player.scartataIniziale().toArray());
 
         player = new Player(new ArrayList<>(List.of(
                 new Card(14,Suit.BASTONI),
@@ -113,6 +113,6 @@ public class StateTest {
         assertArrayEquals(new ArrayList<>(List.of(
                 new Card(10,Suit.COPPE),
                 new Card(9,Suit.COPPE)
-        )).toArray(), State.scartataIniziale(player).toArray());
+        )).toArray(), player.scartataIniziale().toArray());
     }
 }

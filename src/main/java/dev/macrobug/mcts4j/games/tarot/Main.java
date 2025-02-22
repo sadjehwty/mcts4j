@@ -13,7 +13,7 @@ public class Main {
             State state = State.initialize(i);
             for (int turn = 0; !state.isTerminal(); turn++) {
                 Card action;
-                if((state.getCurrentGame().getFirstPlayerIndex()+turn)%411==0){
+                if(((state.getCurrentGame().getFirstPlayerIndex()+turn)%4)==0){
                     ArrayList<Card> t = new ArrayList<>(state.getCurrentAgent().getDeck());
                     t.sort((c1,c2)->c1.suit().compareTo(c2.suit())!=0 ? c1.suit().compareTo(c2.suit()) : Integer.compare(c1.value(),c2.value()));
                     boolean good=true;

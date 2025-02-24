@@ -17,17 +17,17 @@ public class Main {
                     ArrayList<Card> t = new ArrayList<>(state.getCurrentAgent().getDeck());
                     t.sort((c1,c2)->c1.suit().compareTo(c2.suit())!=0 ? c1.suit().compareTo(c2.suit()) : Integer.compare(c1.value(),c2.value()));
                     boolean good;
-                    int choise;
+                    int choice;
                     do{
                         for(int j=0;j<t.size();j++)
                             System.out.printf("%1$4d",j);
                         System.out.println();
                         for (Card card : t) System.out.printf("%1$4s", card);
                         System.out.println();
-                        choise = Integer.parseInt(sc.nextLine());
-                        good = choise < t.size() && choise>-1;
+                        choice = Integer.parseInt(sc.nextLine());
+                        good = choice < t.size() && choice>-1;
                     }while(!good);
-                    action = t.get(choise);
+                    action = t.get(choice);
                 } else
                     action = mcts.uctSearchWithExploration(state, 1.5);
                 state.performActionForCurrentAgent(action);
